@@ -99,18 +99,6 @@ function AdminLogin({ onLogin }) {
             {isLoading ? 'Logging in...' : 'Login'}
           </motion.button>
         </form>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="login-footer"
-        >
-          <p>Admin: admin@kevina.com / admin123</p>
-          <p style={{ marginTop: '5px', fontSize: '0.9em', opacity: 0.8 }}>
-            Secondary: akilainduwara205@gmail.com / induwara5522
-          </p>
-        </motion.div>
       </motion.div>
     </div>
   )
