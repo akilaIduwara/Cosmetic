@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getProducts, getCart, saveCart } from '../utils/storage'
+import { getProducts, getCart, addToCart as addToCartStorage, removeFromCart as removeFromCartStorage, saveCart } from '../utils/storage'
 import Header from './Header'
 import ProductCard from './ProductCard'
 import Cart from './Cart'
@@ -19,18 +19,30 @@ function UserStore() {
   useEffect(() => {
     setProducts(getProducts())
     setCart(getCart())
+    
+    // Listen for cart updates
+    const handleCartUpdate = (event) => {
+      if (event.detail) {
+        setCart(event.detail)
+      } else {
+        setCart(getCart())
+      }
+    }
+    window.addEventListener('cartUpdated', handleCartUpdate)
+    
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate)
+    }
   }, [])
 
-  const addToCart = (product) => {
-    const newCart = [...cart, { ...product, cartId: Date.now() }]
-    setCart(newCart)
-    saveCart(newCart)
+  const addToCart = (product, quantity = 1) => {
+    addToCartStorage(product, quantity)
+    // Cart will update automatically via event
   }
 
   const removeFromCart = (cartId) => {
-    const newCart = cart.filter(item => item.cartId !== cartId)
-    setCart(newCart)
-    saveCart(newCart)
+    removeFromCartStorage(cartId)
+    // Cart will update automatically via event
   }
 
   const clearCart = () => {

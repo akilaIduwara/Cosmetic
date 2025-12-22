@@ -130,11 +130,200 @@ export const saveProducts = (products) => {
 
 export const getCart = () => {
   const stored = localStorage.getItem('kevina_cart')
-  return stored ? JSON.parse(stored) : []
+  const cart = stored ? JSON.parse(stored) : []
+  // Ensure all items have quantity (for backward compatibility)
+  return cart.map(item => ({
+    ...item,
+    quantity: item.quantity || 1
+  }))
 }
 
 export const saveCart = (cart) => {
   localStorage.setItem('kevina_cart', JSON.stringify(cart))
+  // Dispatch custom event for real-time updates
+  window.dispatchEvent(new CustomEvent('cartUpdated', { detail: cart }))
+}
+
+export const addToCart = (product, quantity = 1) => {
+  const cart = getCart()
+  const existingItemIndex = cart.findIndex(item => item.id === product.id)
+  
+  if (existingItemIndex >= 0) {
+    // Update quantity if item already exists
+    cart[existingItemIndex].quantity += quantity
+  } else {
+    // Add new item
+    cart.push({
+      ...product,
+      cartId: Date.now(),
+      quantity: quantity
+    })
+  }
+  
+  saveCart(cart)
+  // Dispatch custom event for real-time updates
+  window.dispatchEvent(new CustomEvent('cartUpdated', { detail: cart }))
+  return cart
+}
+
+export const updateCartItemQuantity = (cartId, quantity) => {
+  const cart = getCart()
+  const itemIndex = cart.findIndex(item => item.cartId === cartId)
+  
+  if (itemIndex >= 0) {
+    if (quantity <= 0) {
+      cart.splice(itemIndex, 1)
+    } else {
+      cart[itemIndex].quantity = quantity
+    }
+    saveCart(cart)
+    // Dispatch custom event for real-time updates
+    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: cart }))
+  }
+  
+  return cart
+}
+
+export const removeFromCart = (cartId) => {
+  const cart = getCart()
+  const newCart = cart.filter(item => item.cartId !== cartId)
+  saveCart(newCart)
+  // Dispatch custom event for real-time updates
+  window.dispatchEvent(new CustomEvent('cartUpdated', { detail: newCart }))
+  return newCart
+}
+
+export const getOrders = () => {
+  const stored = localStorage.getItem('kevina_orders')
+  return stored ? JSON.parse(stored) : []
+}
+
+export const saveOrder = (order) => {
+  const orders = getOrders()
+  const newOrder = {
+    ...order,
+    id: Date.now(),
+    date: new Date().toISOString()
+  }
+  orders.push(newOrder)
+  localStorage.setItem('kevina_orders', JSON.stringify(orders))
+  return newOrder
+}
+
+// Content Management
+const CONTENT_KEY = 'kevina_site_content'
+
+const defaultContent = {
+  hero: {
+    title: 'Discover Your True Radiance',
+    subtitle: 'Premium cosmetics crafted for the modern individual. Embrace your natural beauty with our exclusive collection.',
+    button1: 'Shop Collection',
+    button2: 'Our Story'
+  },
+  home: {
+    features: [
+      { icon: '✨', title: 'Premium Quality', description: 'Carefully selected products from trusted brands' },
+      { icon: '🚚', title: 'Islandwide Delivery', description: 'Fast and reliable delivery across Sri Lanka' },
+      { icon: '💳', title: 'Secure Payment', description: 'Safe and secure payment options' },
+      { icon: '🎁', title: 'Special Offers', description: 'Exclusive deals and discounts' }
+    ],
+    featuredTitle: 'Featured Collection',
+    featuredSubtitle: 'Discover our handpicked selection of premium products',
+    viewAllButton: 'View All Products',
+    whyChooseTitle: 'Why Choose Kevina?',
+    whyChooseText1: 'We believe that beauty is a personal journey. Our products are cruelty-free, sustainably sourced, and designed to enhance your natural features rather than mask them.',
+    whyChooseText2: 'Based in Boralesgamuwa, we offer islandwide delivery, bringing premium beauty products directly to your doorstep. Experience the difference with Kevina Cosmetics.',
+    learnMoreButton: 'Learn More'
+  },
+  about: {
+    heroTitle: 'Our Story',
+    heroSubtitle: 'Redefining beauty with nature and science',
+    welcomeTitle: 'Welcome to Kevina Cosmetics',
+    welcomeText1: 'At Kevina Cosmetics, we believe that beauty is a personal journey. Founded with a passion for premium quality and natural ingredients, we\'ve been serving customers across Sri Lanka with the finest cosmetics and skincare products.',
+    welcomeText2: 'Our mission is to enhance your natural beauty while maintaining the highest standards of quality, sustainability, and ethical practices. Every product in our collection is carefully selected to ensure it meets our rigorous standards for effectiveness and safety.',
+    welcomeText3: 'Based in Boralesgamuwa, we offer islandwide delivery, bringing premium beauty products directly to your doorstep. Whether you\'re looking for skincare essentials, haircare solutions, or the latest beauty trends, we\'ve got you covered.',
+    whyChooseTitle: 'Why Choose Us',
+    features: [
+      { icon: '🌿', title: 'Natural Ingredients', description: 'We source only the finest natural and organic ingredients for our products.' },
+      { icon: '🐰', title: 'Cruelty-Free', description: 'All our products are certified cruelty-free and never tested on animals.' },
+      { icon: '🌍', title: 'Sustainable', description: 'We are committed to eco-friendly packaging and sustainable practices.' },
+      { icon: '✨', title: 'Premium Quality', description: 'Every product is carefully formulated to meet the highest quality standards.' }
+    ],
+    stats: [
+      { number: '10K+', label: 'Happy Customers' },
+      { number: '500+', label: 'Products' },
+      { number: '50+', label: 'Cities Served' },
+      { number: '5+', label: 'Years Experience' }
+    ],
+    missionTitle: 'Our Mission',
+    missionText: 'To empower individuals to express their unique beauty through premium, ethically-sourced cosmetics and skincare products. We are committed to providing exceptional quality, outstanding customer service, and sustainable practices that benefit both our customers and the planet.'
+  },
+  contact: {
+    heroTitle: 'Get in Touch',
+    heroSubtitle: 'We\'d love to hear from you. Send us a message and we\'ll respond as soon as possible.',
+    infoTitle: 'Contact Information',
+    infoDescription: 'Have a question or need assistance? We\'re here to help! Reach out to us through any of the following channels.',
+    contactInfo: [
+      { icon: '📍', title: 'Location', details: 'Boralesgamuwa, Sri Lanka' },
+      { icon: '📞', title: 'Phone', details: '+94 77 123 4567' },
+      { icon: '✉️', title: 'Email', details: 'info@kevinacosmetics.com' },
+      { icon: '🕒', title: 'Hours', details: 'Mon - Sat: 9:00 AM - 6:00 PM' }
+    ],
+    mapNote: 'Islandwide Delivery Available',
+    formTitle: 'Send us a Message',
+    submitButton: 'Send Message'
+  },
+  footer: {
+    tagline: 'Redefining beauty with nature and science. Premium cosmetics for the modern you.',
+    newsletterTitle: 'Stay Updated',
+    newsletterText: 'Subscribe to our newsletter for exclusive offers, beauty tips, and new product launches.',
+    newsletterButton: 'Subscribe',
+    location: '📍 Boralesgamuwa | Islandwide Delivery',
+    copyright: `© ${new Date().getFullYear()} Kevina Cosmetics. All rights reserved.`
+  },
+  shop: {
+    heroTitle: 'Our Collection',
+    heroSubtitle: 'Discover premium cosmetics and skincare products'
+  }
+}
+
+export const getContent = () => {
+  const stored = localStorage.getItem(CONTENT_KEY)
+  if (stored) {
+    return JSON.parse(stored)
+  }
+  // Initialize with default content
+  saveContent(defaultContent)
+  return defaultContent
+}
+
+export const saveContent = (content) => {
+  localStorage.setItem(CONTENT_KEY, JSON.stringify(content))
+}
+
+export const updateContent = (section, field, value) => {
+  const content = getContent()
+  if (field.includes('.')) {
+    // Handle nested fields like features[0].title
+    const parts = field.split('.')
+    const arrayMatch = parts[0].match(/^(\w+)\[(\d+)\]$/)
+    if (arrayMatch) {
+      const arrayName = arrayMatch[1]
+      const index = parseInt(arrayMatch[2])
+      const subField = parts[1]
+      if (!content[section][arrayName]) {
+        content[section][arrayName] = []
+      }
+      if (!content[section][arrayName][index]) {
+        content[section][arrayName][index] = {}
+      }
+      content[section][arrayName][index][subField] = value
+    }
+  } else {
+    content[section][field] = value
+  }
+  saveContent(content)
+  return content
 }
 
 

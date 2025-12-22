@@ -1,7 +1,20 @@
 import { motion, AnimatePresence } from 'framer-motion'
+import { updateCartItemQuantity, removeFromCart as removeFromCartStorage } from '../utils/storage'
 
 function Cart({ cart, onBack, onRemove, onCheckout }) {
-  const total = cart.reduce((sum, item) => sum + item.price, 0)
+  const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0)
+
+  const handleQuantityChange = (cartId, newQuantity) => {
+    updateCartItemQuantity(cartId, newQuantity)
+  }
+
+  const handleRemove = (cartId) => {
+    if (onRemove) {
+      onRemove(cartId)
+    } else {
+      removeFromCartStorage(cartId)
+    }
+  }
 
   return (
     <motion.div
@@ -56,16 +69,38 @@ function Cart({ cart, onBack, onRemove, onCheckout }) {
                     />
                     <div className="cart-item-info">
                       <h4>{item.name}</h4>
-                      <p>Rs. {item.price.toLocaleString()}</p>
+                      <p className="cart-item-price">Rs. {item.price.toLocaleString()} each</p>
+                      <p className="cart-item-subtotal">Subtotal: Rs. {(item.price * (item.quantity || 1)).toLocaleString()}</p>
                     </div>
-                    <motion.button
-                      whileHover={{ scale: 1.1, rotate: 90 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => onRemove(item.cartId)}
-                      className="remove-button"
-                    >
-                      ✕
-                    </motion.button>
+                    <div className="cart-item-controls">
+                      <div className="cart-quantity-control">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleQuantityChange(item.cartId, (item.quantity || 1) - 1)}
+                          className="quantity-control-btn"
+                        >
+                          −
+                        </motion.button>
+                        <span className="cart-quantity">{item.quantity || 1}</span>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleQuantityChange(item.cartId, (item.quantity || 1) + 1)}
+                          className="quantity-control-btn"
+                        >
+                          +
+                        </motion.button>
+                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.1, rotate: 90 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleRemove(item.cartId)}
+                        className="remove-button"
+                      >
+                        ✕
+                      </motion.button>
+                    </div>
                   </motion.div>
                 ))}
               </AnimatePresence>

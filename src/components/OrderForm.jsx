@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { saveOrder } from '../utils/storage'
 
 function OrderForm({ cart, onBack, onComplete }) {
   const [formData, setFormData] = useState({
@@ -17,6 +18,21 @@ function OrderForm({ cart, onBack, onComplete }) {
       alert('Please enter your name and phone number!')
       return
     }
+
+    // Save order to localStorage
+    const order = {
+      customerName: formData.name,
+      phone: formData.phone,
+      address: formData.address,
+      items: cart.map(item => ({
+        name: item.name,
+        price: item.price,
+        image: item.image
+      })),
+      total: total,
+      status: 'pending'
+    }
+    saveOrder(order)
 
     let msg = '📦 *New Order - Kevina Cosmetics* %0A%0A'
     msg += '*Name:* ' + formData.name + '%0A'

@@ -3,17 +3,44 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg-primary, linear-gradient(180deg, #faf8f5 0%, #ffffff 100%));
   padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s ease;
+}
+
+[data-theme="dark"] .login-page {
+  background: var(--bg-primary, linear-gradient(180deg, #1f1f1f 0%, #2a2a2a 100%));
+}
+
+.login-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .login-container {
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: 20px;
   padding: 50px 40px;
   max-width: 450px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-hover, 0 20px 60px rgba(0, 0, 0, 0.1));
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+[data-theme="dark"] .login-container {
+  background: var(--card-bg, #2a2a2a);
 }
 
 .login-header {
@@ -22,14 +49,18 @@
 }
 
 .login-header h1 {
+  font-family: 'Playfair Display', serif;
   font-size: 2.5rem;
-  color: #667eea;
+  background: linear-gradient(135deg, #1a1a1a 0%, #d4af37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 10px;
   font-weight: 700;
 }
 
 .login-header p {
-  color: #666;
+  color: var(--text-muted);
   font-size: 1rem;
 }
 
@@ -48,22 +79,31 @@
 .form-group label {
   font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-light);
 }
 
 .form-group input {
   padding: 15px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--input-border, rgba(0, 0, 0, 0.1));
   border-radius: 10px;
   font-size: 1rem;
   font-family: inherit;
   transition: all 0.3s ease;
+  background: var(--input-bg, #f9f9f9);
+  color: var(--text-light, #1a1a1a);
+}
+
+[data-theme="dark"] .form-group input {
+  border-color: var(--input-border, rgba(212, 175, 55, 0.2));
+  background: var(--input-bg, #353535);
+  color: var(--text-light, #e8e8e8);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+  background: var(--card-bg);
 }
 
 .error-message {
@@ -77,23 +117,25 @@
 }
 
 .login-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #d4af37 0%, #b5952f 100%);
   color: white;
   border: none;
   padding: 15px 30px;
-  border-radius: 10px;
+  border-radius: 50px;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
   margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .login-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  background: linear-gradient(135deg, #b5952f 0%, #d4af37 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
 }
 
 .login-button:disabled {
