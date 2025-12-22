@@ -766,6 +766,8 @@
   align-items: center;
   padding-top: 1rem;
   border-top: 2px solid var(--input-border, rgba(0, 0, 0, 0.1));
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 [data-theme="dark"] .order-footer {
@@ -776,6 +778,41 @@
   font-size: 1.3rem;
   color: var(--accent, #d4af37);
   font-weight: 700;
+}
+
+.order-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.whatsapp-order-btn {
+  padding: 0.8rem 1.8rem;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.whatsapp-order-btn svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.whatsapp-order-btn:hover {
+  background: linear-gradient(135deg, #128C7E, #25D366);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
 }
 
 .complete-order-btn {
@@ -810,23 +847,76 @@
     padding: 30px 20px;
   }
 
+  .order-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .order-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .whatsapp-order-btn,
+  .complete-order-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .admin-tabs {
     flex-direction: column;
     gap: 0;
+    padding: 0;
   }
 
   .admin-tab {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    width: 100%;
+    padding: 1rem;
+    border-bottom: 1px solid var(--input-border, rgba(0, 0, 0, 0.1));
     border-left: 3px solid transparent;
+    border-right: none;
+    border-top: none;
   }
 
   .admin-tab.active {
     border-left-color: #d4af37;
-    border-bottom-color: rgba(0, 0, 0, 0.1);
+    border-bottom-color: var(--input-border, rgba(0, 0, 0, 0.1));
+  }
+
+  .admin-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .admin-filters-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .search-bar {
+    max-width: 100%;
+  }
+
+  .admin-filter-buttons {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .admin-filter-btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
   }
 
   .order-card {
     padding: 1.5rem;
+  }
+
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
 
   .order-footer {
@@ -835,8 +925,15 @@
     align-items: stretch;
   }
 
+  .order-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .whatsapp-order-btn,
   .complete-order-btn {
     width: 100%;
+    justify-content: center;
   }
 }
 

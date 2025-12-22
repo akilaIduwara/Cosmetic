@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Shop from './pages/Shop'
 import About from './pages/About'
 import Contact from './pages/Contact'
+import Checkout from './pages/Checkout'
 import AdminPanel from './components/AdminPanel'
 import AdminLogin from './components/AdminLogin'
 import { isAuthenticated } from './utils/auth'
@@ -95,6 +96,7 @@ function App() {
       <Route path="/shop" element={<Layout><Shop /></Layout>} />
       <Route path="/about" element={<Layout><About /></Layout>} />
       <Route path="/contact" element={<Layout><Contact /></Layout>} />
+      <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
       <Route path="/admin" element={<AdminRoute />} />
     </Routes>
   )

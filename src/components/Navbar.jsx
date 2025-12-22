@@ -259,7 +259,7 @@ const Navbar = () => {
                       <span>Total:</span>
                       <span className="total-amount">Rs. {total.toLocaleString()}</span>
                     </div>
-                    <Link to="/shop" onClick={() => setShowCart(false)} className="btn btn-primary btn-block">
+                    <Link to="/checkout" onClick={() => setShowCart(false)} className="btn btn-primary btn-block">
                       Checkout
                     </Link>
                   </div>

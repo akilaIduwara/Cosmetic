@@ -157,12 +157,56 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .login-page {
+    padding: 1rem;
+  }
+
   .login-container {
-    padding: 40px 30px;
+    padding: 2.5rem 2rem;
+    max-width: 100%;
   }
 
   .login-header h1 {
     font-size: 2rem;
+  }
+
+  .login-header p {
+    font-size: 0.9rem;
+  }
+
+  .form-group input {
+    padding: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .login-button {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .login-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .form-group input {
+    padding: 0.9rem;
+    font-size: 0.9rem;
+  }
+
+  .login-button {
+    padding: 0.9rem 1.5rem;
+    font-size: 0.95rem;
   }
 }
 

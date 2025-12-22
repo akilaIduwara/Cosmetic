@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { updateCartItemQuantity, removeFromCart as removeFromCartStorage } from '../utils/storage'
 
 function Cart({ cart, onBack, onRemove, onCheckout }) {
@@ -114,14 +115,16 @@ function Cart({ cart, onBack, onRemove, onCheckout }) {
               <div className="cart-total">
                 <h3>Total: Rs. {total.toLocaleString()}</h3>
               </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onCheckout}
-                className="checkout-button"
-              >
-                Proceed to Checkout
-              </motion.button>
+              <Link to="/checkout" style={{ textDecoration: 'none' }}>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="checkout-button"
+                  style={{ width: '100%' }}
+                >
+                  Proceed to Checkout
+                </motion.button>
+              </Link>
             </motion.div>
           </>
         )}

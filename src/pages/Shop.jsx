@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { getProducts, getCart, addToCart, getContent } from '../utils/storage';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { getProducts, getCart, addToCart, removeFromCart, saveCart, getContent } from '../utils/storage';
 import ProductCard from '../components/ProductCard';
+import Cart from '../components/Cart';
+import OrderForm from '../components/OrderForm';
 import './Shop.css';
 
 const Shop = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
     const [filter, setFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [content, setContent] = useState(getContent().shop);
+    const [showCart, setShowCart] = useState(false);
+    const [showOrderForm, setShowOrderForm] = useState(false);
 
     useEffect(() => {
         setProducts(getProducts());
@@ -33,6 +40,16 @@ const Shop = () => {
         };
     }, []);
 
+    // Check URL for cart parameter
+    useEffect(() => {
+        const urlParams = new URLSearchParams(location.search);
+        if (urlParams.get('cart') === 'true') {
+            setShowCart(true);
+        } else {
+            setShowCart(false);
+        }
+    }, [location.search]);
+
     const handleAddToCart = (product, quantity = 1) => {
         addToCart(product, quantity);
         // Cart will update automatically via event
@@ -51,6 +68,18 @@ const Shop = () => {
             notification.classList.remove('show');
             setTimeout(() => document.body.removeChild(notification), 300);
         }, 2000);
+    };
+
+    const handleRemoveFromCart = (cartId) => {
+        removeFromCart(cartId);
+    };
+
+    const handleOrderComplete = () => {
+        saveCart([]);
+        setShowOrderForm(false);
+        setShowCart(false);
+        // Show success message
+        alert('Order placed successfully! Check your WhatsApp for order confirmation.');
     };
 
     const filteredProducts = products.filter(product => {
@@ -73,18 +102,44 @@ const Shop = () => {
 
     return (
         <div className="shop-page">
-            <motion.div
-                initial={{ opacity: 0, y: -50 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="shop-hero"
-            >
-                <div className="shop-hero-content">
-                    <h1 className="shop-title">{content.heroTitle}</h1>
-                    <p className="shop-subtitle">{content.heroSubtitle}</p>
-                </div>
-            </motion.div>
+            <AnimatePresence mode="wait">
+                {showOrderForm ? (
+                    <OrderForm
+                        key="order"
+                        cart={cart}
+                        onBack={() => setShowOrderForm(false)}
+                        onComplete={handleOrderComplete}
+                    />
+                ) : showCart ? (
+                    <Cart
+                        key="cart"
+                        cart={cart}
+                        onBack={() => {
+                            setShowCart(false);
+                            navigate('/shop');
+                        }}
+                        onRemove={handleRemoveFromCart}
+                        onCheckout={() => {
+                            setShowCart(false);
+                            setShowOrderForm(true);
+                            navigate('/shop');
+                        }}
+                    />
+                ) : (
+                    <>
+                        <motion.div
+                            key="shop"
+                            initial={{ opacity: 0, y: -50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="shop-hero"
+                        >
+                            <div className="shop-hero-content">
+                                <h1 className="shop-title">{content.heroTitle}</h1>
+                                <p className="shop-subtitle">{content.heroSubtitle}</p>
+                            </div>
+                        </motion.div>
 
-            <div className="shop-container">
+                        <div className="shop-container">
                 <motion.div
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -158,6 +213,9 @@ const Shop = () => {
                     )}
                 </motion.div>
             </div>
+                    </>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

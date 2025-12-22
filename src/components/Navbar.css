@@ -429,6 +429,16 @@
   text-align: center;
 }
 
+@media (max-width: 968px) {
+  .navbar-links {
+    gap: 1.5rem;
+  }
+
+  .nav-link {
+    font-size: 0.9rem;
+  }
+}
+
 @media (max-width: 768px) {
   .navbar-links {
     display: none;
@@ -443,15 +453,83 @@
   }
 
   .navbar-container {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
   }
 
-  .admin-link {
-    display: none;
+  .logo-text {
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+  }
+
+  .logo-subtitle {
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+  }
+
+  .cart-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .cart-button svg {
+    width: 20px;
+    height: 20px;
   }
 
   .cart-sidebar {
     max-width: 100%;
+    width: 100%;
+  }
+
+  .cart-sidebar-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .cart-sidebar-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .cart-sidebar-item img {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+  }
+
+  .cart-sidebar-controls {
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-container {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .logo-text {
+    font-size: 1.3rem;
+    letter-spacing: 1.5px;
+  }
+
+  .logo-subtitle {
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+  }
+
+  .cart-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .cart-badge {
+    font-size: 0.7rem;
+    min-width: 18px;
+    height: 18px;
+    padding: 0.1rem 0.3rem;
   }
 }
 
