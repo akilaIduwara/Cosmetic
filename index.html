@@ -57,21 +57,39 @@
       // Track if app loaded
       window.__APP_LOADED__ = false;
       
-      // Show error if script fails to load
+      // Show error if critical script fails to load (ignore analytics/beacon scripts)
       window.addEventListener('error', function(e) {
         if (e.target && e.target.tagName === 'SCRIPT') {
-          const root = document.getElementById('root');
-          if (root && !window.__APP_LOADED__) {
-            root.innerHTML = `
-              <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
-                <h1 style="color: #d4af37;">Failed to Load Script</h1>
-                <p style="color: #666;">Error loading: ${e.target.src || 'unknown'}</p>
-                <p style="color: #666; margin-top: 1rem;">Please check the browser console (F12) for more details.</p>
-                <button onclick="window.location.reload()" style="margin-top: 1rem; padding: 0.75rem 2rem; background: #d4af37; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                  Reload Page
-                </button>
-              </div>
-            `;
+          const scriptSrc = e.target.src || '';
+          // Ignore Cloudflare Insights, analytics, and other non-critical scripts
+          const ignoredScripts = [
+            'cloudflareinsights.com',
+            'beacon.min.js',
+            'analytics',
+            'gtag',
+            'ga.js',
+            'googletagmanager'
+          ];
+          
+          const isIgnored = ignoredScripts.some(ignore => scriptSrc.includes(ignore));
+          
+          if (!isIgnored && scriptSrc) {
+            const root = document.getElementById('root');
+            if (root && !window.__APP_LOADED__) {
+              // Only show error for app scripts, not analytics
+              if (scriptSrc.includes('/src/') || scriptSrc.includes('/assets/') || scriptSrc.includes('main')) {
+                root.innerHTML = `
+                  <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
+                    <h1 style="color: #d4af37;">Failed to Load Application Script</h1>
+                    <p style="color: #666;">Error loading: ${scriptSrc}</p>
+                    <p style="color: #666; margin-top: 1rem;">Please check the browser console (F12) for more details.</p>
+                    <button onclick="window.location.reload()" style="margin-top: 1rem; padding: 0.75rem 2rem; background: #d4af37; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                      Reload Page
+                    </button>
+                  </div>
+                `;
+              }
+            }
           }
         }
       }, true);
@@ -81,19 +99,36 @@
         if (!window.__APP_LOADED__) {
           const root = document.getElementById('root');
           if (root && root.querySelector('.loading-fallback')) {
+            // Check if script actually loaded
+            const scripts = Array.from(document.querySelectorAll('script[type="module"]'));
+            const appScript = scripts.find(s => s.src && (s.src.includes('/src/main') || s.src.includes('/assets/') || s.src.includes('main')));
+            
+            let diagnosticInfo = '';
+            if (!appScript || !appScript.src) {
+              diagnosticInfo = '<p style="color: #d00; margin-top: 1rem;"><strong>Issue:</strong> Application script not found in page.</p>';
+            } else {
+              diagnosticInfo = `<p style="color: #666; margin-top: 1rem;"><strong>Script URL:</strong> ${appScript.src}</p>`;
+            }
+            
             root.innerHTML = `
-              <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
+              <div style="padding: 2rem; text-align: center; font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                 <h1 style="color: #d4af37;">Application Loading Timeout</h1>
                 <p style="color: #666;">The application is taking longer than expected to load.</p>
+                ${diagnosticInfo}
                 <p style="color: #666; margin-top: 1rem;">Please check:</p>
                 <ul style="text-align: left; display: inline-block; color: #666; margin: 1rem 0;">
-                  <li>Browser console (F12) for errors</li>
-                  <li>Network tab to see if files are loading</li>
-                  <li>Your internet connection</li>
+                  <li>Browser console (F12) → Console tab for errors</li>
+                  <li>Browser console (F12) → Network tab for failed requests</li>
+                  <li>Look for messages starting with "Initializing React app..."</li>
                 </ul>
-                <button onclick="window.location.reload()" style="margin-top: 1rem; padding: 0.75rem 2rem; background: #d4af37; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                  Reload Page
-                </button>
+                <div style="margin-top: 1.5rem;">
+                  <button onclick="window.location.reload()" style="padding: 0.75rem 2rem; background: #d4af37; color: white; border: none; border-radius: 8px; cursor: pointer; margin-right: 1rem;">
+                    Reload Page
+                  </button>
+                  <button onclick="console.log('App loaded:', window.__APP_LOADED__); console.log('Scripts:', Array.from(document.querySelectorAll('script')).map(s => s.src || s.textContent.substring(0, 50)));" style="padding: 0.75rem 2rem; background: #666; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                    Check Console
+                  </button>
+                </div>
               </div>
             `;
           }
