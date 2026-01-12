@@ -27,29 +27,30 @@ jobs:
     
     - name: Verify build output
       run: |
+        echo "Checking build output..."
+        
         if [ ! -f "dist/index.html" ]; then
           echo "❌ ERROR: dist/index.html not found!"
           exit 1
         fi
+        echo "✅ dist/index.html exists"
         
         if [ ! -d "dist/assets" ]; then
           echo "❌ ERROR: dist/assets directory not found!"
           exit 1
         fi
-        
-        if grep -q "/src/main.jsx" dist/index.html; then
-          echo "❌ ERROR: dist/index.html still contains /src/main.jsx!"
-          echo "Build did not transform the HTML correctly."
-          exit 1
-        fi
-        
-        if ! grep -q "/assets/" dist/index.html; then
-          echo "❌ ERROR: dist/index.html does not contain /assets/ paths!"
-          exit 1
-        fi
-        
-        echo "✅ Build verification passed!"
-        echo "✅ dist/index.html exists"
         echo "✅ dist/assets/ directory exists"
-        echo "✅ Script paths are correct"
+        
+        if [ ! -f "scripts/verify-build.js" ]; then
+          echo "❌ ERROR: scripts/verify-build.js not found!"
+          exit 1
+        fi
+        
+        # Use the Node.js verification script (more accurate - only checks script tag src)
+        echo "Running build verification script..."
+        node scripts/verify-build.js
+        
+        echo ""
+        echo "✅ Build verification passed!"
+        echo "✅ All checks completed successfully"
 
