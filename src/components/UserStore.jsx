@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getProducts, getCart, addToCart as addToCartStorage, removeFromCart as removeFromCartStorage, saveCart } from '../utils/storage'
 import Header from './Header'
