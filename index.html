@@ -77,7 +77,8 @@
             const root = document.getElementById('root');
             if (root && !window.__APP_LOADED__) {
               // Only show error for app scripts, not analytics
-              if (scriptSrc.includes('/src/') || scriptSrc.includes('/assets/') || scriptSrc.includes('main')) {
+              // In production, scripts should be in /assets/, not /src/
+              if (scriptSrc.includes('/src/main.jsx') || (scriptSrc.includes('/assets/') && !window.__APP_LOADED__)) {
                 root.innerHTML = `
                   <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
                     <h1 style="color: #d4af37;">Failed to Load Application Script</h1>
