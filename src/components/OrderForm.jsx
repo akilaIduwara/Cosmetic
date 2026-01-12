@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { saveOrder } from '../utils/storage'
+import { saveOrder, getDeliveryFee } from '../utils/storage'
 
 function OrderForm({ cart, onBack, onComplete }) {
   const [formData, setFormData] = useState({
@@ -9,7 +9,9 @@ function OrderForm({ cart, onBack, onComplete }) {
     address: ''
   })
 
-  const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0)
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0)
+  const deliveryFee = getDeliveryFee()
+  const total = subtotal + deliveryFee
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -32,6 +34,8 @@ function OrderForm({ cart, onBack, onComplete }) {
         quantity: item.quantity || 1,
         image: item.image
       })),
+      subtotal: subtotal,
+      deliveryFee: deliveryFee,
       total: total,
       status: 'pending'
     }
@@ -56,6 +60,11 @@ function OrderForm({ cart, onBack, onComplete }) {
       message += `   Qty: ${quantity} × Rs. ${item.price.toLocaleString()} = Rs. ${itemTotal.toLocaleString()}\n`
     })
     
+    message += `\n📊 *ORDER SUMMARY*\n`
+    message += `Subtotal: Rs. ${subtotal.toLocaleString()}\n`
+    if (deliveryFee > 0) {
+      message += `Delivery Fee: Rs. ${deliveryFee.toLocaleString()}\n`
+    }
     message += `\n💰 *TOTAL: Rs. ${total.toLocaleString()}*\n`
     message += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
     message += `Thank you for your order! 🙏`
@@ -65,7 +74,7 @@ function OrderForm({ cart, onBack, onComplete }) {
     
     // WhatsApp number (format: country code + number without + or 0)
     // Example: 94771234567 for Sri Lanka
-    const whatsappNumber = '94715143363' // Change this to your WhatsApp number
+    const whatsappNumber = '94702886067' // Change this to your WhatsApp number
     
     // Open WhatsApp
     window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank')
@@ -135,6 +144,16 @@ function OrderForm({ cart, onBack, onComplete }) {
               <span>Total Items:</span>
               <span>{cart.reduce((sum, item) => sum + (item.quantity || 1), 0)}</span>
             </div>
+            <div className="order-total-line">
+              <span>Subtotal:</span>
+              <span>Rs. {subtotal.toLocaleString()}</span>
+            </div>
+            {deliveryFee > 0 && (
+              <div className="order-total-line">
+                <span>Delivery Fee:</span>
+                <span>Rs. {deliveryFee.toLocaleString()}</span>
+              </div>
+            )}
             <div className="order-total-amount">
               <strong>Total Amount: Rs. {total.toLocaleString()}</strong>
             </div>

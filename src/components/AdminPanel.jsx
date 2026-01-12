@@ -96,6 +96,13 @@ function AdminPanel() {
       message += `${idx + 1}. ${item.name}\n`
       message += `   Qty: ${quantity} × Rs. ${item.price.toLocaleString()} = Rs. ${itemTotal.toLocaleString()}\n`
     })
+    message += `\n📊 *ORDER SUMMARY*\n`
+    const subtotal = order.subtotal || order.items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0)
+    const deliveryFee = order.deliveryFee || 0
+    message += `Subtotal: Rs. ${subtotal.toLocaleString()}\n`
+    if (deliveryFee > 0) {
+      message += `Delivery Fee: Rs. ${deliveryFee.toLocaleString()}\n`
+    }
     message += `\n💰 *TOTAL: Rs. ${order.total.toLocaleString()}*\n`
     message += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
     message += `Thank you for your order! 🙏`
@@ -105,7 +112,7 @@ function AdminPanel() {
     
     // Replace with your WhatsApp number (format: country code + number without + or 0)
     // Example: 94771234567 for Sri Lanka
-    const whatsappNumber = '94771234567' // Change this to your WhatsApp number
+    const whatsappNumber = '94702886067' // Change this to your WhatsApp number
     
     // Open WhatsApp
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`
@@ -421,6 +428,18 @@ function AdminPanel() {
                         </div>
                         <div className="order-footer">
                           <div className="order-total">
+                            {order.subtotal && (
+                              <>
+                                <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
+                                  <span>Subtotal: Rs. {order.subtotal.toLocaleString()}</span>
+                                </div>
+                                {order.deliveryFee > 0 && (
+                                  <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
+                                    <span>Delivery Fee: Rs. {order.deliveryFee.toLocaleString()}</span>
+                                  </div>
+                                )}
+                              </>
+                            )}
                             <strong>Total: Rs. {order.total.toLocaleString()}</strong>
                           </div>
                           <div className="order-actions">
@@ -486,6 +505,18 @@ function AdminPanel() {
                         </div>
                         <div className="order-footer">
                           <div className="order-total">
+                            {order.subtotal && (
+                              <>
+                                <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
+                                  <span>Subtotal: Rs. {order.subtotal.toLocaleString()}</span>
+                                </div>
+                                {order.deliveryFee > 0 && (
+                                  <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
+                                    <span>Delivery Fee: Rs. {order.deliveryFee.toLocaleString()}</span>
+                                  </div>
+                                )}
+                              </>
+                            )}
                             <strong>Total: Rs. {order.total.toLocaleString()}</strong>
                           </div>
                           <div className="order-actions">

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { getCart, saveOrder, saveCart } from '../utils/storage'
+import { getCart, saveOrder, saveCart, getDeliveryFee } from '../utils/storage'
 import './Checkout.css'
 
 function Checkout() {
@@ -23,7 +23,9 @@ function Checkout() {
     setCart(cartItems)
   }, [navigate])
 
-  const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0)
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0)
+  const deliveryFee = getDeliveryFee()
+  const total = subtotal + deliveryFee
   const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0)
 
   const handleConfirmOrder = () => {
@@ -45,6 +47,8 @@ function Checkout() {
         quantity: item.quantity || 1,
         image: item.image
       })),
+      subtotal: subtotal,
+      deliveryFee: deliveryFee,
       total: total,
       status: 'pending'
     }
@@ -69,6 +73,11 @@ function Checkout() {
       message += `   Qty: ${quantity} × Rs. ${item.price.toLocaleString()} = Rs. ${itemTotal.toLocaleString()}\n`
     })
     
+    message += `\n📊 *ORDER SUMMARY*\n`
+    message += `Subtotal: Rs. ${subtotal.toLocaleString()}\n`
+    if (deliveryFee > 0) {
+      message += `Delivery Fee: Rs. ${deliveryFee.toLocaleString()}\n`
+    }
     message += `\n💰 *TOTAL: Rs. ${total.toLocaleString()}*\n`
     message += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
     message += `Thank you for your order! 🙏`
@@ -77,7 +86,7 @@ function Checkout() {
     const encodedMessage = encodeURIComponent(message)
     
     // WhatsApp number (format: country code + number without + or 0)
-    const whatsappNumber = '94715143363' // Change this to your WhatsApp number
+    const whatsappNumber = '94702886067' // Change this to your WhatsApp number
     
     // Clear cart after order
     saveCart([])
@@ -170,6 +179,16 @@ function Checkout() {
                 <span>Total Items:</span>
                 <span>{totalItems}</span>
               </div>
+              <div className="summary-line">
+                <span>Subtotal:</span>
+                <span>Rs. {subtotal.toLocaleString()}</span>
+              </div>
+              {deliveryFee > 0 && (
+                <div className="summary-line">
+                  <span>Delivery Fee:</span>
+                  <span>Rs. {deliveryFee.toLocaleString()}</span>
+                </div>
+              )}
               <div className="summary-total">
                 <span>Total Amount:</span>
                 <span className="total-price">Rs. {total.toLocaleString()}</span>

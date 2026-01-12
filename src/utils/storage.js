@@ -244,10 +244,9 @@ const defaultContent = {
     welcomeText3: 'Based in Boralesgamuwa, we offer islandwide delivery, bringing premium beauty products directly to your doorstep. Whether you\'re looking for skincare essentials, haircare solutions, or the latest beauty trends, we\'ve got you covered.',
     whyChooseTitle: 'Why Choose Us',
     features: [
-      { icon: '🌿', title: 'Natural Ingredients', description: 'We source only the finest natural and organic ingredients for our products.' },
-      { icon: '🐰', title: 'Cruelty-Free', description: 'All our products are certified cruelty-free and never tested on animals.' },
-      { icon: '🌍', title: 'Sustainable', description: 'We are committed to eco-friendly packaging and sustainable practices.' },
-      { icon: '✨', title: 'Premium Quality', description: 'Every product is carefully formulated to meet the highest quality standards.' }
+      { icon: '🌍', title: 'Trusted Global Brands', description: 'Our products come from internationally recognized brands known for quality, safety, and proven results.' },
+      { icon: '💰', title: 'Affordable & Competitive Prices', description: 'Get premium skincare and haircare products at reasonable prices without compromising quality.' },
+      { icon: '🚚', title: 'Fast & Reliable Delivery', description: 'We ensure quick and safe delivery across Sri Lanka, right to your doorstep.' }
     ],
     stats: [
       { number: '10K+', label: 'Happy Customers' },
@@ -265,8 +264,8 @@ const defaultContent = {
     infoDescription: 'Have a question or need assistance? We\'re here to help! Reach out to us through any of the following channels.',
     contactInfo: [
       { icon: '📍', title: 'Location', details: 'Boralesgamuwa, Sri Lanka' },
-      { icon: '📞', title: 'Phone', details: '+94 77 123 4567' },
-      { icon: '✉️', title: 'Email', details: 'info@kevinacosmetics.com' },
+      { icon: '📞', title: 'Phone', details: '+94702886067' },
+      { icon: '✉️', title: 'Email', details: 'kevinacosmetics2026@gmail.com' },
       { icon: '🕒', title: 'Hours', details: 'Mon - Sat: 9:00 AM - 6:00 PM' }
     ],
     mapNote: 'Islandwide Delivery Available',
@@ -324,6 +323,24 @@ export const updateContent = (section, field, value) => {
   }
   saveContent(content)
   return content
+}
+
+// Delivery Fee Management
+const DELIVERY_FEE_KEY = 'kevina_delivery_fee'
+
+export const getDeliveryFee = () => {
+  const stored = localStorage.getItem(DELIVERY_FEE_KEY)
+  if (stored) {
+    return parseFloat(stored) || 0
+  }
+  // Default delivery fee
+  const defaultFee = 0
+  saveDeliveryFee(defaultFee)
+  return defaultFee
+}
+
+export const saveDeliveryFee = (fee) => {
+  localStorage.setItem(DELIVERY_FEE_KEY, fee.toString())
 }
 
 

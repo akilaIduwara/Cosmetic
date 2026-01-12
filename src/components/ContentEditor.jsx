@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getContent, saveContent } from '../utils/storage'
+import { getContent, saveContent, getDeliveryFee, saveDeliveryFee } from '../utils/storage'
 import './ContentEditor.css'
 
 function ContentEditor({ onClose }) {
   const [content, setContent] = useState(getContent())
   const [activeSection, setActiveSection] = useState('hero')
   const [saved, setSaved] = useState(false)
+  const [deliveryFee, setDeliveryFee] = useState(getDeliveryFee())
 
   useEffect(() => {
     setContent(getContent())
@@ -38,6 +39,7 @@ function ContentEditor({ onClose }) {
 
   const handleSave = () => {
     saveContent(content)
+    saveDeliveryFee(deliveryFee)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
     // Trigger page refresh to show changes
@@ -50,7 +52,8 @@ function ContentEditor({ onClose }) {
     { id: 'about', label: 'About Page', icon: '📖' },
     { id: 'contact', label: 'Contact Page', icon: '📞' },
     { id: 'footer', label: 'Footer', icon: '📄' },
-    { id: 'shop', label: 'Shop Page', icon: '🛍️' }
+    { id: 'shop', label: 'Shop Page', icon: '🛍️' },
+    { id: 'settings', label: 'Settings', icon: '⚙️' }
   ]
 
   const renderField = (section, field, value, label, type = 'text') => {
@@ -256,6 +259,29 @@ function ContentEditor({ onClose }) {
                   <>
                     {renderField('shop', 'heroTitle', content.shop.heroTitle, 'Hero Title')}
                     {renderField('shop', 'heroSubtitle', content.shop.heroSubtitle, 'Hero Subtitle')}
+                  </>
+                )}
+
+                {activeSection === 'settings' && (
+                  <>
+                    <div className="content-field">
+                      <label>Delivery Fee (Rs.)</label>
+                      <input
+                        type="number"
+                        value={deliveryFee}
+                        onChange={(e) => {
+                          setDeliveryFee(parseFloat(e.target.value) || 0)
+                          setSaved(false)
+                        }}
+                        className="content-input"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                      />
+                      <p style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
+                        This fee will be automatically added to all customer orders.
+                      </p>
+                    </div>
                   </>
                 )}
               </motion.div>
