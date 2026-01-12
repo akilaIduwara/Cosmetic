@@ -9,6 +9,7 @@ module.exports = {
     filename: 'assets/[name].[contenthash].js',
     clean: true,
     publicPath: '/',
+    assetModuleFilename: 'assets/[name].[hash][ext]',
   },
   module: {
     rules: [
@@ -18,13 +19,29 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env', '@babel/preset-react'],
+            presets: [
+              '@babel/preset-env',
+              [
+                '@babel/preset-react',
+                {
+                  runtime: 'automatic'
+                }
+              ]
+            ],
           },
         },
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: false,
+            },
+          },
+        ],
       },
       {
         test: /\.(png|jpg|jpeg|gif|svg)$/i,

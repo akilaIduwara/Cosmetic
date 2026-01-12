@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getProducts, saveProducts, getOrders } from '../utils/storage'
 import { isAuthenticated, setAuthenticated, isAdmin } from '../utils/auth'
