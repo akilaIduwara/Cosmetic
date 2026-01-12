@@ -3,7 +3,7 @@
  * 
  * This utility provides environment-aware API URLs.
  * In development, it uses localhost:3000
- * In production, it uses the Vercel deployment URL
+ * In production, it uses the Cloudflare Pages deployment URL
  */
 
 // Get API URL from environment variable, with fallback
@@ -20,8 +20,8 @@ const getApiUrl = () => {
     // Development mode
     return 'http://localhost:3000'
   } else {
-    // Production mode - use the deployed URL
-    return 'https://cosmetic-delta.vercel.app'
+    // Production mode - use the Cloudflare Pages URL
+    return 'https://kevinacosmetics.lk'
   }
 }
 
