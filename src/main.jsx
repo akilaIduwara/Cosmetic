@@ -116,6 +116,10 @@ if (!rootElement) {
       </React.StrictMode>
     )
     console.log('App rendered successfully!')
+    // Mark app as loaded
+    if (typeof window !== 'undefined') {
+      window.__APP_LOADED__ = true
+    }
   } catch (error) {
     console.error('Failed to render app:', error)
     if (rootElement) {
