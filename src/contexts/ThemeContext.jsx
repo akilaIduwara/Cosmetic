@@ -12,20 +12,32 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('kevina_theme');
-      const initialTheme = savedTheme || 'light';
-      // Initialize immediately
-      document.documentElement.setAttribute('data-theme', initialTheme);
-      return initialTheme;
+    try {
+      if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+        const savedTheme = localStorage.getItem('kevina_theme');
+        const initialTheme = savedTheme || 'light';
+        // Initialize immediately
+        if (document.documentElement) {
+          document.documentElement.setAttribute('data-theme', initialTheme);
+        }
+        return initialTheme;
+      }
+    } catch (error) {
+      console.error('Error initializing theme:', error);
     }
     return 'light';
   });
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('kevina_theme', theme);
-      document.documentElement.setAttribute('data-theme', theme);
+    try {
+      if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+        localStorage.setItem('kevina_theme', theme);
+        if (document.documentElement) {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating theme:', error);
     }
   }, [theme]);
 
