@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kevina Cosmetics - Boralesgamuwa</title>
+
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fafafa; color: #333; }
+    header { background: #e91e63; color: white; padding: 40px; text-align: center; }
+    .section { padding: 30px; max-width: 900px; margin: auto; background: white; margin-top: 20px;
+               border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .products { display: flex; flex-wrap: wrap; gap: 20px; }
+    .product-card { width: 250px; background: white; padding: 15px; border-radius: 10px;
+                    box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: center; }
+    .product-card img { width: 100%; border-radius: 10px; }
+    .btn { background: #e91e63; color: white; padding: 10px 20px; border-radius: 6px;
+           cursor: pointer; display: inline-block; margin-top: 10px; }
+    .btn:hover { background: #c2185b; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; border-bottom: 1px solid #ccc; }
+    footer { text-align: center; padding: 20px; margin-top: 30px; background: #333; color: white; }
+    #cartPage, #orderPage, #successPage { display: none; }
+  </style>
+
+</head>
+
+<body>
+
+<header>
+  <h1>Kevina Cosmetics</h1>
+  <p>Boralesgamuwa | Quality Products | Islandwide Delivery</p>
+  
+  <div id="cartIcon" onclick="showPage('cartPage')">
+    <div class="btn" onclick="showPage('cartPage')">🛒 View Cart</div>">
+    <span id="cartCount">0</span>
+  </div>
+</header>
+
+<!-- ================= HOME PAGE ================= -->
+<div id="homePage">
+
+  <div class="section">
+    <h2>About Us</h2>
+    <p>Welcome to <strong>Kevina Cosmetics</strong> — where beauty meets confidence. We offer high-quality, cruelty-free cosmetics and skincare to help you express your unique style</p>
+  </div>
+
+  <div class="section">
+    <h2>Popular Products</h2>
+
+    <div class="products">
+
+      <div class="product-card">
+        <img src="https://www.blushme.lk/cdn/shop/files/3_5802d669-e3fa-4c30-816a-16c5e53d16bb.png?v=1735488701">
+        <h3>The Ordinary Alpha Arbutin</h3>
+        <p>Rs. 5800</p>
+        <div class="btn" onclick="addToCart('The Ordinary Alpha Arbutin', 5800)">Add to Cart</div>
+      </div>
+
+    <div class="product-card">
+      <img src="https://budgethut.lk/wp-content/uploads/2025/07/Untitleddesign_69.png" alt="Odinary Glycolic Acid 240ml" width="300">
+      <h3>Odinary Glycolic Acid 240ML</h3>
+      <p>Rs. 6,200</p>
+      <div class="btn" onclick="addToCart('Odinary Glycolic Acid 240ML', 6200)">Add to Cart</div>
+     </div>
+
+     <div class="product-card">
+      <img src="https://libertystore.lk/wp-content/uploads/2025/03/New-Project-2025-03-18T140720.784.png" alt="Odinary Nicenamide 30ML" width="300">
+      <h3>Odinary Nicenamide 30ML</h3>
+      <p>Rs. 3,000</p>
+      <div class="btn" onclick="addToCart('Odinary Nicenamide 30ML', 3000)">Add to Cart</div>
+    </div>
+
+    <div class="product-card">
+      <img src="https://erange.lk/wp-content/uploads/2022/04/The-Ordinary-AHA-30-BHA-2-Peeling-Solution-600x781.jpeg" alt="Odinary Peeling Solution 30ML" width="300">
+      <h3>Odinary Peeling Solution 30ML</h3>
+      <p>Rs. 4,200</p>
+     <div class="btn" onclick="addToCart('Odinary Peeling Solution 30ML', 4200)">Add to Cart</div>
+    </div>
+
+   <div class="product-card">
+      <img src="https://simplyglow.lk/wp-content/uploads/2025/04/1743444615_13457346-1894912002988002.jpg" alt="Ordinary Salicylic Acid 2% Anhydrous Solution 30ML" width="300">
+      <h3>Ordinary Salicylic Acid 2% Anhydrous Solution 30ML</h3>
+      <p>Rs. 4,500</p>
+     <div class="btn" onclick="addToCart('Ordinary Salicylic Acid 2% Anhydrous Solution 30ML', 4500)">Add to Cart</div>
+    </div>
+
+    <div class="product-card">
+      <img src="https://www.essentials.lk/cdn/shop/files/TheOrdinaryMarineHyaluronicsSerum30ml.jpg?crop=center&height=1000&v=1731904212&width=1000.jpg" alt="Ordinary Marine Hyaluronics Serum 30ml">
+      <h3>Ordinary Marine Hyaluronics Serum 30ml</h3>
+      <p>Rs. 4,700</p>
+      <div class="btn" onclick="addToCart('Ordinary Marine Hyaluronics Serum 30ml', 4700)">Add to Cart</div>
+    </div>
+    
+    <div class="product-card">
+      <img src="https://www.thecareak.com/wp-content/uploads/2025/05/The-Ordinary-Soothing-Barrier-Support-Serum.jpg" alt=" Ordinary Soothing and Barrier Support Serum 30ml (A multi-active solution)">
+      <h3> Ordinary Soothing and Barrier Support Serum 30ml (A multi-active solution)</h3>
+      <p>Rs.4,900</p>
+      <div class="btn" onclick="addToCart('Ordinary Soothing and Barrier Support Serum 30ml ', 4900)">Add to Cart</div>
+    </div>
+
+    <div class="product-card">
+      <img src="https://www.beautygalleryng.com/wp-content/uploads/2022/03/rdn-ascorbyl-glucoside-solution-12pct-30ml-3.png" alt="Ordinary Ascorbyl Glucoside Solution 12%(Vitamin C) 30ML">
+      <h3>Ordinary Ascorbyl Glucoside Solution 12%(Vitamin C) 30ML</h3>
+      <p>Rs. 7,800</p>
+      <div class="btn" onclick="addToCart('Ordinary Ascorbyl Glucoside Solution 12%(Vitamin C) 30ML', 7800)">Add to Cart</div>
+    </div>
+
+    <div class="product-card">
+      <img src="https://m.media-amazon.com/images/I/51Haw2Z4HfL._AC_UF1000,1000_QL80_.jpg" alt="Ordinary Multi Antioxidant Radiance Serum 30ML">
+      <h3>Ordinary Multi Antioxidant Radiance Serum 30ML</h3>
+      <p>Rs. 6,450</p>
+      <div class="btn" onclick="addToCart('Ordinary Multi Antioxidant Radiance Serum 30ML', 6450)">Add to Cart</div>
+    </div>
+
+    <div class="product-card">
+      <img src="https://histyle.ie/wp-content/uploads/2024/05/Hi-Style-2-2.jpg" alt="Odinary Saccharomyces Ferment 30% Milky Toner 100ML">
+      <h3>Odinary Saccharomyces Ferment 30% Milky Toner 100ML</h3>
+      <p>Rs. 7,500</p>
+      <div class="btn" onclick="addToCart('Odinary Saccharomyces Ferment 30% Milky Toner 100M', 7500)">Add to Cart</div>
+    </div>
+
+    <div class="product-card">
+      <img src="https://shopxonline.lk/cdn/shop/files/the-ordinary-squalane-face-cleanser-50ml-canada-512580.webp?v=1725949181.jpg" alt="Ordinary Squalane Cleanser 50ml">
+      <h3>Ordinary Squalane Cleanser 50ml</h3>
+      <p>Rs. 5,950</p>
+      <div class="btn" onclick="addToCart('Ordinary Squalane Cleanser 50ml', 5950)">Add to Cart</div>
+    </div>
+
+    <div class="product-card">
+      <img src="https://www.essentials.lk/cdn/shop/products/TheOrdinaryNaturalMoisturizingFactors_HA.jpg?v=1614435828.jpg" alt="Ordinary Natural Moisturizing Factors + HA 30ml">
+      <h3>Ordinary Natural Moisturizing Factors + HA 30ml</h3>
+      <p>Rs. 8,750</p>
+      <div class="btn" onclick="addToCart('Ordinary Natural Moisturizing Factors + HA 30ml', 8750)">Add to Cart</div>
+    </div>
+    
+    <div class="product-card">
+      <img src="https://static-01.daraz.lk/p/9cc32aa9ad5c9c2cc1ab2a2d87973edf.jpg" alt="TRESemmé Keratin Smooth Shampoo 700Ml (Uk)">
+      <h3>TRESemmé Keratin Smooth Shampoo 700Ml (Uk)</h3>
+      <p>Rs. 4,500</p>
+      <div class="btn" onclick="addToCart('TRESemmé Keratin Smooth Shampoo 700Ml (Uk)', 4500)">Add to Cart</div>
+    </div>
+    
+    <div class="product-card">
+      <img src="https://supersavings.lk/wp-content/uploads/2022/11/tresemme-keratin-shampoo-700ml.jpg" alt="Tresemme Keratin Smooth Conditioner 700ml">
+      <h3>Tresemme Keratin Smooth Conditioner 700ml</h3>
+      <p>Rs. 4,600</p>
+      <div class="btn" onclick="addToCart('Tresemme Keratin Smooth Conditioner 700ml', 4600)">Add to Cart</div>
+    </div>
+
+    <div class="product-card">
+      <img src="https://supersavings.lk/wp-content/uploads/2023/09/tresemme-botanique-shampoo.jpg" alt="TRESemme Botanique Nourish & Replenish Shampoo 700ml">
+      <h3>TRESemme Botanique Nourish & Replenish Shampoo 700ml</h3>
+      <p>Rs. 3,750</p>
+      <div class="btn" onclick="addToCart('TRESemme Botanique Nourish & Replenish Shampoo 700ml', 5800)">Add to Cart</div>
+    </div>
+
+    
+    <div class="product-card">
+      <img src="https://shopxonline.lk/cdn/shop/files/Untitleddesign-2024-11-11T161311.241.png?v=1731321803" alt="Tresemme Botanique Nourish + Replenish Conditioner, Coconut Oil and Aloe Vera 700Ml">
+      <h3>Tresemme Botanique Nourish + Replenish Conditioner, Coconut Oil and Aloe Vera 700Ml</h3>
+      <p>Rs. 3,750</p>
+      <div class="btn" onclick="addToCart('Tresemme Botanique Nourish + Replenish Conditioner, Coconut Oil and Aloe Vera 700Mln', 3750)">Add to Cart</div>
+    </div>
+
+    
+    <div class="product-card">
+      <img src="https://static.beautytocare.com/media/catalog/product/o/g/ogx-renewing-argan-oil-of-morocco-shampoo-385ml_2.jpg" alt="OGX Renewing + Argan Oil of Morocco Shampoo 385ml">
+      <h3>OGX Renewing + Argan Oil of Morocco Shampoo 385ml</h3>
+      <p>Rs. 5,000</p>
+      <div class="btn" onclick="addToCart('OGX Renewing + Argan Oil of Morocco Shampoo 385m', 5000)">Add to Cart</div>
+    </div>
+
+    <div class="product-card">
+      <img src="https://static.beautytocare.com/cdn-cgi/image/width=1600,height=1600,f=auto/media/catalog/product//o/g/ogx-renewing-argan-oil-of-morocco-conditioner-385ml_2.jpg" alt="OGX Renewing + Argan Oil of Morocco Conditioner 385ml">
+      <h3>OGX Renewing + Argan Oil of Morocco Conditioner 385ml </h3>
+      <p>Rs. 5,100</p>
+      <div class="btn" onclick="addToCart('OGX Renewing + Argan Oil of Morocco Conditioner 385ml ', 5100)">Add to Cart</div>
+    </div>
+
+    <div class="product-card">
+      <img src="https://images.albertsons-media.com/is/image/ABS/960133960-C1N1?$ng-ecom-pdp-mobile$&defaultImage=Not_Available.jpg" alt="OGX Biotin and Collagen Shampoo 385ml">
+      <h3>OGX Biotin and Collagen Shampoo 385ml</h3>
+      <p>Rs. 5,000</p>
+      <div class="btn" onclick="addToCart('OGX Biotin and Collagen Shampoo 385ml', 5000)">Add to Cart</div>
+    </div>
+    
+    </div>
+  </div>
+
+</div>
+
+<div id="cartPage" class="section">
+  <h2>Your Cart</h2>
+
+  <table id="cartTable">
+    <tr><th>Product</th><th>Price</th><th>Action</th></tr>
+  </table>
+
+  <h3>Total: Rs. <span id="cartTotal">0</span></h3>
+
+  <div class="btn" onclick="goToOrder()">Proceed to Order</div>
+  <div class="btn" onclick="showPage('homePage')">Back</div>
+</div>
+
+
+<!-- ================= ORDER PAGE ================= -->
+<div id="orderPage" class="section">
+  <h2>Order Summary</h2>
+
+  <div id="orderSummary"></div>
+
+  <h3>Your Details</h3>
+  <input id="name" placeholder="Your Name">
+  <input id="phone" placeholder="Phone Number">
+  <textarea id="address" placeholder="Delivery Address"></textarea>
+
+  <div class="btn" onclick="placeOrder()">Send Order via WhatsApp</div>
+</div>
+
+
+<!-- ================= SUCCESS PAGE ================= -->
+<div id="successPage" class="section">
+  <h1>🎉 Order Sent Successfully!</h1>
+  <p>Your order has been sent to WhatsApp.</p>
+  <div class="btn" onclick="showPage('homePage')">Return Home</div>
+</div>
+
+
+<footer>
+  © 2025 Kevina Cosmetics | Boralesgamuwa
+</footer>
+
+
+<!-- TOAST -->
+<div id="toast">Item added to cart! ✔</div>
+
+
+<!-- ================= JAVASCRIPT ================= -->
+<script>
+let cart = [];
+
+/* TOAST MESSAGE */
+function showToast(message) {
+  let toast = document.getElementById("toast");
+  toast.innerText = message;
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2000);
+}
+
+/* SOUND EFFECT */
+function playSound() {
+  document.getElementById("cartSound").play();
+}
+
+/* UPDATE CART COUNTER */
+function updateCartCount() {
+  document.getElementById("cartCount").innerText = cart.length;
+}
+
+/* ADD TO CART */
+function addToCart(name, price) {
+  cart.push({ name, price });
+  updateCartCount();
+  playSound();  
+  showToast(name + " added to cart!");
+}
+
+/* PAGE SWITCHER */
+function showPage(page) {
+  document.getElementById("homePage").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("orderPage").style.display = "none";
+  document.getElementById("successPage").style.display = "none";
+  document.getElementById(page).style.display = "block";
+
+  if (page === "cartPage") loadCart();
+  if (page === "orderPage") loadOrderSummary();
+}
+
+/* LOAD CART */
+function loadCart() {
+  let table = document.getElementById("cartTable");
+  table.innerHTML = "<tr><th>Product</th><th>Price</th><th>Action</th></tr>";
+
+  let total = 0;
+
+  cart.forEach((item, i) => {
+    total += item.price;
+
+    table.innerHTML += `
+      <tr>
+        <td>${item.name}</td>
+        <td>Rs. ${item.price}</td>
+        <td><div class='btn' onclick='removeItem(${i})'>Remove</div></td>
+      </tr>`;
+  });
+
+  document.getElementById("cartTotal").innerText = total;
+}
+
+/* REMOVE ITEM */
+function removeItem(i) {
+  cart.splice(i, 1);
+  loadCart();
+  updateCartCount();
+}
+
+/* GO TO ORDER PAGE */
+function goToOrder() {
+  if (cart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+  showPage("orderPage");
+}
+
+/* LOAD ORDER SUMMARY */
+function loadOrderSummary() {
+  let summary = "";
+  let total = 0;
+
+  cart.forEach(item => {
+    summary += `${item.name} - Rs. ${item.price}<br>`;
+    total += item.price;
+  });
+
+  summary += `<br><strong>Total: Rs. ${total}</strong>`;
+  document.getElementById("orderSummary").innerHTML = summary;
+}
+
+/* WHATSAPP ORDER SENDING */
+function placeOrder() {
+  let name = document.getElementById("name").value;
+  let phone = document.getElementById("phone").value;
+  let address = document.getElementById("address").value;
+
+  if (!name || !phone) {
+    alert("Please enter your name and phone number!");
+    return;
+  }
+
+  let msg = "📦 *New Order - Kevina Cosmetics* %0A%0A";
+  msg += "*Name:* " + name + "%0A";
+  msg += "*Phone:* " + phone + "%0A";
+  msg += "*Address:* " + address + "%0A%0A";
+  msg += "*Order Items:* %0A";
+
+  let total = 0;
+
+  cart.forEach(item => {
+    msg += "- " + item.name + " | Rs. " + item.price + "%0A";
+    total += item.price;
+  });
+
+  msg += "%0A*Total:* Rs. " + total + "%0A";
+
+  let whatsappNumber = "94715143363";
+
+  window.open("https://wa.me/" + whatsappNumber + "?text=" + msg, "_blank");
+
+  cart = [];
+  updateCartCount();
+  showPage("successPage");
+}
+</script>
+
+</body>
+</html>
