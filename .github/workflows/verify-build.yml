@@ -1,0 +1,55 @@
+name: Verify Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  verify-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build project
+      run: npm run build
+    
+    - name: Verify build output
+      run: |
+        if [ ! -f "dist/index.html" ]; then
+          echo "❌ ERROR: dist/index.html not found!"
+          exit 1
+        fi
+        
+        if [ ! -d "dist/assets" ]; then
+          echo "❌ ERROR: dist/assets directory not found!"
+          exit 1
+        fi
+        
+        if grep -q "/src/main.jsx" dist/index.html; then
+          echo "❌ ERROR: dist/index.html still contains /src/main.jsx!"
+          echo "Build did not transform the HTML correctly."
+          exit 1
+        fi
+        
+        if ! grep -q "/assets/" dist/index.html; then
+          echo "❌ ERROR: dist/index.html does not contain /assets/ paths!"
+          exit 1
+        fi
+        
+        echo "✅ Build verification passed!"
+        echo "✅ dist/index.html exists"
+        echo "✅ dist/assets/ directory exists"
+        echo "✅ Script paths are correct"
+

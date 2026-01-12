@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [react()],
@@ -16,6 +17,7 @@ export default defineConfig({
     emptyOutDir: true,
     // Ensure proper handling of static assets
     rollupOptions: {
+      input: resolve(__dirname, 'index.html'),
       output: {
         manualChunks: undefined,
         assetFileNames: 'assets/[name]-[hash][extname]',
@@ -23,7 +25,9 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js'
       }
     }
-  }
+  },
+  // Ensure public files are copied correctly
+  publicDir: 'public'
 })
 
 
