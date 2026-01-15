@@ -14,6 +14,7 @@ import AdminProductCard from './AdminProductCard'
 import ProductForm from './ProductForm'
 import ChangePassword from './ChangePassword'
 import ContentEditor from './ContentEditor'
+import ThemeToggle from './ThemeToggle'
 import './AdminPanel.css'
 
 function AdminPanel() {
@@ -184,6 +185,7 @@ function AdminPanel() {
 
   return (
     <div className="admin-panel">
+      <ThemeToggle />
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
