@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getCart, addToCart as addToCartStorage, removeFromCart as removeFromCartStorage, saveCart } from '../utils/storage'
 import { subscribeToProducts, getProductsFromFirestore } from '../utils/firestore'
+import '../utils/migrateProducts' // Auto-migrate default products
 import Header from './Header'
 import ProductCard from './ProductCard'
 import Cart from './Cart'

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getCart, addToCart, removeFromCart, saveCart, getContent } from '../utils/storage';
 import { subscribeToProducts, getProductsFromFirestore } from '../utils/firestore';
+import '../utils/migrateProducts'; // Auto-migrate default products
 import ProductCard from '../components/ProductCard';
 import Cart from '../components/Cart';
 import OrderForm from '../components/OrderForm';

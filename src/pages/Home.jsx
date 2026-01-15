@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { getCart, addToCart, getContent } from '../utils/storage';
 import { subscribeToProducts } from '../utils/firestore';
+import '../utils/migrateProducts'; // Auto-migrate default products
 import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
 import './Home.css';

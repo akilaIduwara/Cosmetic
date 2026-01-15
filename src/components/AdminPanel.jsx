@@ -9,6 +9,7 @@ import {
   deleteProductFromFirestore,
   subscribeToProducts 
 } from '../utils/firestore'
+import '../utils/migrateProducts' // Auto-migrate default products
 import AdminProductCard from './AdminProductCard'
 import ProductForm from './ProductForm'
 import ChangePassword from './ChangePassword'

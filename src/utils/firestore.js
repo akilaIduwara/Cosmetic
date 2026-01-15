@@ -23,23 +23,48 @@ import {
 export const getProductsFromFirestore = async () => {
   try {
     const productsRef = collection(db, PRODUCTS_COLLECTION)
-    const q = query(productsRef, orderBy('createdAt', 'desc'))
-    const querySnapshot = await getDocs(q)
+    
+    // Try to query with orderBy, but handle case where createdAt might not exist
+    let querySnapshot
+    try {
+      const q = query(productsRef, orderBy('createdAt', 'desc'))
+      querySnapshot = await getDocs(q)
+    } catch (orderError) {
+      // If orderBy fails (e.g., no createdAt field or index), just get all products
+      console.warn('Firestore: Could not order by createdAt, fetching all products:', orderError)
+      querySnapshot = await getDocs(productsRef)
+    }
     
     const products = []
     querySnapshot.forEach((doc) => {
+      const data = doc.data()
       products.push({
         id: doc.id,
-        ...doc.data(),
+        ...data,
         // Convert Firestore Timestamp to regular date if needed
-        createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : doc.data().createdAt
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt
       })
+    })
+    
+    // Sort by createdAt if available, otherwise keep original order
+    products.sort((a, b) => {
+      if (a.createdAt && b.createdAt) {
+        return new Date(b.createdAt) - new Date(a.createdAt)
+      }
+      return 0
     })
     
     console.log('Firestore: Fetched products, count:', products.length)
     return products
   } catch (error) {
     console.error('Error fetching products from Firestore:', error)
+    console.error('Error details:', error.code, error.message)
+    
+    // If permission denied, show helpful message
+    if (error.code === 'permission-denied') {
+      console.error('Firestore: Permission denied. Please check Firestore security rules.')
+    }
+    
     return []
   }
 }
@@ -138,16 +163,34 @@ export const deleteProductFromFirestore = async (productId) => {
 export const subscribeToProducts = (callback) => {
   try {
     const productsRef = collection(db, PRODUCTS_COLLECTION)
-    const q = query(productsRef, orderBy('createdAt', 'desc'))
+    
+    // Try to query with orderBy, but handle case where createdAt might not exist
+    let q
+    try {
+      q = query(productsRef, orderBy('createdAt', 'desc'))
+    } catch (error) {
+      // If orderBy fails (e.g., no createdAt field), just get all products
+      console.warn('Firestore: Could not order by createdAt, fetching all products:', error)
+      q = productsRef
+    }
     
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const products = []
       querySnapshot.forEach((doc) => {
+        const data = doc.data()
         products.push({
           id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : doc.data().createdAt
+          ...data,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt
         })
+      })
+      
+      // Sort by createdAt if available, otherwise keep original order
+      products.sort((a, b) => {
+        if (a.createdAt && b.createdAt) {
+          return new Date(b.createdAt) - new Date(a.createdAt)
+        }
+        return 0
       })
       
       console.log('Firestore: Real-time update, products count:', products.length)
@@ -160,15 +203,29 @@ export const subscribeToProducts = (callback) => {
       }))
     }, (error) => {
       console.error('Firestore: Real-time listener error:', error)
+      console.error('Error details:', error.code, error.message)
+      
+      // If permission denied, show helpful message
+      if (error.code === 'permission-denied') {
+        console.error('Firestore: Permission denied. Please check Firestore security rules.')
+        alert('Cannot load products. Please check Firestore security rules allow read access.')
+      }
+      
       // Fallback to fetching products
-      getProductsFromFirestore().then(callback)
+      getProductsFromFirestore().then(callback).catch((fetchError) => {
+        console.error('Firestore: Fallback fetch also failed:', fetchError)
+        callback([]) // Return empty array on complete failure
+      })
     })
     
     return unsubscribe
   } catch (error) {
     console.error('Error setting up products listener:', error)
     // Fallback to fetching products
-    getProductsFromFirestore().then(callback)
+    getProductsFromFirestore().then(callback).catch((fetchError) => {
+      console.error('Firestore: Fallback fetch failed:', fetchError)
+      callback([]) // Return empty array on complete failure
+    })
     return () => {} // Return empty unsubscribe function
   }
 }
