@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getProducts, getCart, addToCart as addToCartStorage, removeFromCart as removeFromCartStorage, saveCart } from '../utils/storage'
+
+// Helper to get products count for debugging
+const getProductsCount = () => getProducts().length
 import Header from './Header'
 import ProductCard from './ProductCard'
 import Cart from './Cart'
@@ -25,6 +28,14 @@ function UserStore() {
     // Initial load
     loadData()
     
+    // Force a re-render after a short delay to ensure mobile devices catch it
+    const timeoutId = setTimeout(() => {
+      const currentProducts = getProducts()
+      if (currentProducts.length > 0) {
+        setProducts([...currentProducts])
+      }
+    }, 100)
+    
     // Listen for cart updates
     const handleCartUpdate = (event) => {
       if (event.detail) {
@@ -38,14 +49,16 @@ function UserStore() {
     const handleProductsUpdate = (event) => {
       // Get fresh products from storage
       const freshProducts = getProducts()
-      setProducts(freshProducts)
+      console.log('UserStore: Products updated, count:', freshProducts.length)
+      setProducts([...freshProducts]) // Force new array reference
     }
     
     // Listen for storage events (cross-tab synchronization)
     const handleStorageChange = (e) => {
       if (e.key === 'kevina_products' || !e.key) {
         const freshProducts = getProducts()
-        setProducts(freshProducts)
+        console.log('UserStore: Storage changed, products count:', freshProducts.length)
+        setProducts([...freshProducts]) // Force new array reference
       }
       if (e.key === 'kevina_cart' || !e.key) {
         setCart(getCart())
@@ -57,6 +70,7 @@ function UserStore() {
     window.addEventListener('storage', handleStorageChange)
     
     return () => {
+      clearTimeout(timeoutId)
       window.removeEventListener('cartUpdated', handleCartUpdate)
       window.removeEventListener('productsUpdated', handleProductsUpdate)
       window.removeEventListener('storage', handleStorageChange)
@@ -155,17 +169,24 @@ function UserStore() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.4 }}
               className="products-section"
+              style={{ opacity: 1, visibility: 'visible' }}
             >
               <h2>Popular Products</h2>
-              <div className="products-grid">
-                {products.map((product, index) => (
-                  <ProductCard
-                    key={`product-${product.id}-${index}`}
-                    product={product}
-                    onAddToCart={addToCart}
-                    index={index}
-                  />
-                ))}
+              <div className="products-grid" style={{ opacity: 1, visibility: 'visible', display: 'grid' }}>
+                {products.length > 0 ? (
+                  products.map((product, index) => (
+                    <ProductCard
+                      key={`product-${product.id}-${index}`}
+                      product={product}
+                      onAddToCart={addToCart}
+                      index={index}
+                    />
+                  ))
+                ) : (
+                  <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem' }}>
+                    <p>No products available. Total in storage: {getProductsCount()}</p>
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

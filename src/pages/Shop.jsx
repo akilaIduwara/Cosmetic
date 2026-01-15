@@ -28,6 +28,14 @@ const Shop = () => {
         // Initial load
         loadData();
         
+        // Force a re-render after a short delay to ensure mobile devices catch it
+        const timeoutId = setTimeout(() => {
+            const currentProducts = getProducts();
+            if (currentProducts.length > 0) {
+                setProducts([...currentProducts]);
+            }
+        }, 100);
+        
         const updateContent = () => {
             setContent(getContent().shop);
         };
@@ -39,14 +47,16 @@ const Shop = () => {
         const updateProducts = (event) => {
             // Get fresh products from storage
             const freshProducts = getProducts();
-            setProducts(freshProducts);
+            console.log('Products updated, count:', freshProducts.length);
+            setProducts([...freshProducts]); // Force new array reference
         };
         
         // Listen for storage events (cross-tab synchronization)
         const handleStorageChange = (e) => {
             if (e.key === 'kevina_products' || !e.key) {
                 const freshProducts = getProducts();
-                setProducts(freshProducts);
+                console.log('Storage changed, products count:', freshProducts.length);
+                setProducts([...freshProducts]); // Force new array reference
             }
         };
         
@@ -56,6 +66,7 @@ const Shop = () => {
         window.addEventListener('storage', handleStorageChange);
         
         return () => {
+            clearTimeout(timeoutId);
             window.removeEventListener('contentUpdated', updateContent);
             window.removeEventListener('cartUpdated', updateCart);
             window.removeEventListener('productsUpdated', updateProducts);
@@ -118,7 +129,8 @@ const Shop = () => {
         visible: {
             opacity: 1,
             transition: {
-                staggerChildren: 0.1
+                staggerChildren: 0.05,
+                delayChildren: 0
             }
         }
     };
@@ -215,6 +227,7 @@ const Shop = () => {
                     initial="hidden"
                     animate="visible"
                     className="products-grid"
+                    style={{ opacity: 1, visibility: 'visible' }}
                 >
                     {filteredProducts.length > 0 ? (
                         filteredProducts.map((product, index) => (
@@ -230,8 +243,14 @@ const Shop = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             className="no-products"
+                            style={{ gridColumn: '1 / -1' }}
                         >
                             <p>No products found. Try a different search or filter.</p>
+                            {products.length === 0 && (
+                                <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#999' }}>
+                                    Total products in storage: {getProducts().length}
+                                </p>
+                            )}
                         </motion.div>
                     )}
                 </motion.div>

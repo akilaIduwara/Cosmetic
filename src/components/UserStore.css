@@ -241,9 +241,12 @@
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 30px;
   margin-top: 30px;
-  width: 100%;
-  visibility: visible;
-  opacity: 1;
+  width: 100% !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 200px;
+  position: relative;
+  z-index: 1;
 }
 
 .product-card {

@@ -147,9 +147,12 @@
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 2.5rem;
     margin-bottom: 3rem;
-    width: 100%;
+    width: 100% !important;
     visibility: visible !important;
     opacity: 1 !important;
+    min-height: 200px;
+    position: relative;
+    z-index: 1;
 }
 
 .section-footer {
