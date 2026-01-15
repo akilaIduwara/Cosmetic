@@ -32,16 +32,28 @@ const Home = () => {
         
         const updateProducts = () => {
             const allProducts = getProducts();
+            console.log('Home: Products updated, count:', allProducts.length);
             setProducts(allProducts.slice(0, 6)); // Show first 6 products
         };
         
         // Listen for storage events (cross-tab synchronization)
         const handleStorageChange = (e) => {
-            if (e.key === 'kevina_products' || !e.key) {
+            // Check for products key or timestamp key
+            if (e.key === 'kevina_products' || e.key === 'kevina_products_timestamp' || !e.key) {
                 const allProducts = getProducts();
+                console.log('Home: Storage changed, products count:', allProducts.length);
                 setProducts(allProducts.slice(0, 6));
             }
         };
+        
+        // Polling fallback - check for updates every 2 seconds
+        const pollInterval = setInterval(() => {
+            const currentProducts = getProducts();
+            if (currentProducts.length !== products.length) {
+                console.log('Home: Polling detected change, updating products');
+                setProducts(currentProducts.slice(0, 6));
+            }
+        }, 2000);
         
         window.addEventListener('contentUpdated', updateContent);
         window.addEventListener('cartUpdated', updateCart);
@@ -49,6 +61,7 @@ const Home = () => {
         window.addEventListener('storage', handleStorageChange);
         
         return () => {
+            clearInterval(pollInterval);
             window.removeEventListener('contentUpdated', updateContent);
             window.removeEventListener('cartUpdated', updateCart);
             window.removeEventListener('productsUpdated', updateProducts);

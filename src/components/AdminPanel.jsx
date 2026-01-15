@@ -38,9 +38,11 @@ function AdminPanel() {
     
     // Listen for storage events (cross-tab synchronization)
     const handleStorageChange = (e) => {
-      if (e.key === 'kevina_products' || !e.key) {
+      // Check for products key or timestamp key
+      if (e.key === 'kevina_products' || e.key === 'kevina_products_timestamp' || !e.key) {
         const freshProducts = getProducts()
-        setProducts(freshProducts)
+        console.log('AdminPanel: Storage changed, products count:', freshProducts.length)
+        setProducts([...freshProducts]) // Force new array reference
       }
       if (e.key === 'kevina_orders' || !e.key) {
         setOrders(getOrders())
@@ -55,8 +57,18 @@ function AdminPanel() {
       setOrders(getOrders())
     }, 5000)
     
+    // Polling fallback - check for updates every 2 seconds
+    const pollInterval = setInterval(() => {
+      const currentProducts = getProducts()
+      if (currentProducts.length !== products.length) {
+        console.log('AdminPanel: Polling detected change, updating products')
+        setProducts([...currentProducts])
+      }
+    }, 2000)
+    
     return () => {
       clearInterval(interval)
+      clearInterval(pollInterval)
       window.removeEventListener('productsUpdated', handleProductsUpdate)
       window.removeEventListener('storage', handleStorageChange)
     }
@@ -83,14 +95,32 @@ function AdminPanel() {
       const newId = Date.now() + Math.random()
       updatedProducts = [...products, { ...productData, id: newId }]
     }
-    setProducts(updatedProducts)
+    
+    console.log('AdminPanel: Saving products, count:', updatedProducts.length)
+    
+    // Save to storage (this will trigger events)
     saveProducts(updatedProducts)
+    
+    // Update local state
+    setProducts([...updatedProducts])
     setShowForm(false)
     setEditingProduct(null)
-    // Force a re-render by triggering a state update
+    
+    // Force multiple updates to ensure all tabs/devices catch it
     setTimeout(() => {
-      setProducts(getProducts())
-    }, 100)
+      const freshProducts = getProducts()
+      setProducts([...freshProducts])
+      // Trigger another event manually
+      window.dispatchEvent(new CustomEvent('productsUpdated', { 
+        detail: freshProducts,
+        bubbles: true
+      }))
+    }, 50)
+    
+    setTimeout(() => {
+      const freshProducts = getProducts()
+      setProducts([...freshProducts])
+    }, 200)
   }
 
   const handleDeleteProduct = (id) => {

@@ -55,7 +55,8 @@ function UserStore() {
     
     // Listen for storage events (cross-tab synchronization)
     const handleStorageChange = (e) => {
-      if (e.key === 'kevina_products' || !e.key) {
+      // Check for products key or timestamp key
+      if (e.key === 'kevina_products' || e.key === 'kevina_products_timestamp' || !e.key) {
         const freshProducts = getProducts()
         console.log('UserStore: Storage changed, products count:', freshProducts.length)
         setProducts([...freshProducts]) // Force new array reference
@@ -65,12 +66,22 @@ function UserStore() {
       }
     }
     
+    // Polling fallback - check for updates every 2 seconds
+    const pollInterval = setInterval(() => {
+      const currentProducts = getProducts()
+      if (currentProducts.length !== products.length) {
+        console.log('UserStore: Polling detected change, updating products')
+        setProducts([...currentProducts])
+      }
+    }, 2000)
+    
     window.addEventListener('cartUpdated', handleCartUpdate)
     window.addEventListener('productsUpdated', handleProductsUpdate)
     window.addEventListener('storage', handleStorageChange)
     
     return () => {
       clearTimeout(timeoutId)
+      clearInterval(pollInterval)
       window.removeEventListener('cartUpdated', handleCartUpdate)
       window.removeEventListener('productsUpdated', handleProductsUpdate)
       window.removeEventListener('storage', handleStorageChange)
