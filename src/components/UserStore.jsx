@@ -160,7 +160,7 @@ function UserStore() {
               <div className="products-grid">
                 {products.map((product, index) => (
                   <ProductCard
-                    key={product.id}
+                    key={`product-${product.id}-${index}`}
                     product={product}
                     onAddToCart={addToCart}
                     index={index}
