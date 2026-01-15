@@ -6,10 +6,11 @@ const STORAGE_KEY = 'kevina_products'
 
 // Legacy function - now redirects to Firestore
 // Kept for backward compatibility during migration
+// Note: This function is deprecated - components should use subscribeToProducts() directly
 export const getProducts = async () => {
-  // Import dynamically to avoid circular dependencies
-  const { getProductsFromFirestore } = await import('./firestore')
   try {
+    // Import dynamically to avoid circular dependencies
+    const { getProductsFromFirestore } = await import('./firestore')
     return await getProductsFromFirestore()
   } catch (error) {
     console.error('Error getting products from Firestore:', error)
@@ -134,7 +135,6 @@ const DEFAULT_PRODUCTS = [
       image: 'https://images.albertsons-media.com/is/image/ABS/960133960-C1N1?$ng-ecom-pdp-mobile$&defaultImage=Not_Available.jpg'
     }
   ]
-}
 
 // Legacy function - products are now saved to Firestore
 // This function is kept for backward compatibility but should not be used for products
