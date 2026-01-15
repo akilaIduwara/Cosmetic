@@ -24,10 +24,15 @@ function ProductForm({ product, onSave, onCancel }) {
       alert('Please fill in all fields!')
       return
     }
+    const price = parseFloat(formData.price)
+    if (isNaN(price) || price < 0) {
+      alert('Please enter a valid price (must be a positive number)!')
+      return
+    }
     onSave({
-      name: formData.name,
-      price: parseFloat(formData.price),
-      image: formData.image
+      name: formData.name.trim(),
+      price: price,
+      image: formData.image.trim()
     })
   }
 
@@ -69,7 +74,12 @@ function ProductForm({ product, onSave, onCancel }) {
               step="0.01"
               min="0"
               value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              onChange={(e) => {
+                const value = e.target.value
+                if (value === '' || (!isNaN(value) && parseFloat(value) >= 0)) {
+                  setFormData({ ...formData, price: value })
+                }
+              }}
               placeholder="Enter price"
               required
             />

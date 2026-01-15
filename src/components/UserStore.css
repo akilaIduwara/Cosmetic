@@ -237,10 +237,13 @@
 }
 
 .products-grid {
-  display: grid;
+  display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 30px;
   margin-top: 30px;
+  width: 100%;
+  visibility: visible;
+  opacity: 1;
 }
 
 .product-card {
@@ -1111,6 +1114,8 @@
   .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
+    display: grid !important;
+    width: 100%;
   }
   
   .product-image-container {

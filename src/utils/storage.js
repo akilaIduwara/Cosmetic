@@ -125,7 +125,24 @@ export const getProducts = () => {
 }
 
 export const saveProducts = (products) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(products))
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products))
+    // Dispatch custom event for real-time updates
+    const event = new CustomEvent('productsUpdated', { 
+      detail: products,
+      bubbles: true,
+      cancelable: true
+    })
+    window.dispatchEvent(event)
+    // Also trigger storage event for cross-tab synchronization
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: STORAGE_KEY,
+      newValue: JSON.stringify(products)
+    }))
+  } catch (error) {
+    console.error('Error saving products:', error)
+    throw error
+  }
 }
 
 export const getCart = () => {

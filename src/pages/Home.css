@@ -258,6 +258,8 @@
     .products-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 1.5rem;
+        display: grid !important;
+        width: 100%;
     }
 
     .about-preview-content {
@@ -306,8 +308,10 @@
     }
 
     .products-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
         gap: 1.25rem;
+        display: grid !important;
+        width: 100%;
     }
 
     .section-title {

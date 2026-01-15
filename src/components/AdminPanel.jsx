@@ -21,15 +21,45 @@ function AdminPanel() {
   const [productFilter, setProductFilter] = useState('all') // all, skincare, haircare
 
   useEffect(() => {
-    setProducts(getProducts())
-    setOrders(getOrders())
+    const loadData = () => {
+      setProducts(getProducts())
+      setOrders(getOrders())
+    }
+    
+    // Initial load
+    loadData()
+    
+    // Listen for product updates
+    const handleProductsUpdate = (event) => {
+      // Get fresh products from storage
+      const freshProducts = getProducts()
+      setProducts(freshProducts)
+    }
+    
+    // Listen for storage events (cross-tab synchronization)
+    const handleStorageChange = (e) => {
+      if (e.key === 'kevina_products' || !e.key) {
+        const freshProducts = getProducts()
+        setProducts(freshProducts)
+      }
+      if (e.key === 'kevina_orders' || !e.key) {
+        setOrders(getOrders())
+      }
+    }
+    
+    window.addEventListener('productsUpdated', handleProductsUpdate)
+    window.addEventListener('storage', handleStorageChange)
     
     // Refresh orders every 5 seconds
     const interval = setInterval(() => {
       setOrders(getOrders())
     }, 5000)
     
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('productsUpdated', handleProductsUpdate)
+      window.removeEventListener('storage', handleStorageChange)
+    }
   }, [])
 
   const handleAddProduct = () => {
@@ -49,12 +79,18 @@ function AdminPanel() {
         p.id === editingProduct.id ? { ...productData, id: editingProduct.id } : p
       )
     } else {
-      updatedProducts = [...products, { ...productData, id: Date.now() }]
+      // Use a more unique ID to avoid conflicts
+      const newId = Date.now() + Math.random()
+      updatedProducts = [...products, { ...productData, id: newId }]
     }
     setProducts(updatedProducts)
     saveProducts(updatedProducts)
     setShowForm(false)
     setEditingProduct(null)
+    // Force a re-render by triggering a state update
+    setTimeout(() => {
+      setProducts(getProducts())
+    }, 100)
   }
 
   const handleDeleteProduct = (id) => {

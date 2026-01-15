@@ -12,10 +12,15 @@ const Home = () => {
     const [content, setContent] = useState(getContent().home);
 
     useEffect(() => {
-        const allProducts = getProducts();
-        setProducts(allProducts.slice(0, 6)); // Show first 6 products
-        setCart(getCart());
-        setContent(getContent().home);
+        const loadData = () => {
+            const allProducts = getProducts();
+            setProducts(allProducts.slice(0, 6)); // Show first 6 products
+            setCart(getCart());
+            setContent(getContent().home);
+        };
+        
+        // Initial load
+        loadData();
         
         const updateContent = () => {
             setContent(getContent().home);
@@ -25,12 +30,29 @@ const Home = () => {
             setCart(getCart());
         };
         
+        const updateProducts = () => {
+            const allProducts = getProducts();
+            setProducts(allProducts.slice(0, 6)); // Show first 6 products
+        };
+        
+        // Listen for storage events (cross-tab synchronization)
+        const handleStorageChange = (e) => {
+            if (e.key === 'kevina_products' || !e.key) {
+                const allProducts = getProducts();
+                setProducts(allProducts.slice(0, 6));
+            }
+        };
+        
         window.addEventListener('contentUpdated', updateContent);
         window.addEventListener('cartUpdated', updateCart);
+        window.addEventListener('productsUpdated', updateProducts);
+        window.addEventListener('storage', handleStorageChange);
         
         return () => {
             window.removeEventListener('contentUpdated', updateContent);
             window.removeEventListener('cartUpdated', updateCart);
+            window.removeEventListener('productsUpdated', updateProducts);
+            window.removeEventListener('storage', handleStorageChange);
         };
     }, []);
 

@@ -19,9 +19,14 @@ const Shop = () => {
     const [showOrderForm, setShowOrderForm] = useState(false);
 
     useEffect(() => {
-        setProducts(getProducts());
-        setCart(getCart());
-        setContent(getContent().shop);
+        const loadData = () => {
+            setProducts(getProducts());
+            setCart(getCart());
+            setContent(getContent().shop);
+        };
+        
+        // Initial load
+        loadData();
         
         const updateContent = () => {
             setContent(getContent().shop);
@@ -31,12 +36,30 @@ const Shop = () => {
             setCart(getCart());
         };
         
+        const updateProducts = (event) => {
+            // Get fresh products from storage
+            const freshProducts = getProducts();
+            setProducts(freshProducts);
+        };
+        
+        // Listen for storage events (cross-tab synchronization)
+        const handleStorageChange = (e) => {
+            if (e.key === 'kevina_products' || !e.key) {
+                const freshProducts = getProducts();
+                setProducts(freshProducts);
+            }
+        };
+        
         window.addEventListener('contentUpdated', updateContent);
         window.addEventListener('cartUpdated', updateCart);
+        window.addEventListener('productsUpdated', updateProducts);
+        window.addEventListener('storage', handleStorageChange);
         
         return () => {
             window.removeEventListener('contentUpdated', updateContent);
             window.removeEventListener('cartUpdated', updateCart);
+            window.removeEventListener('productsUpdated', updateProducts);
+            window.removeEventListener('storage', handleStorageChange);
         };
     }, []);
 

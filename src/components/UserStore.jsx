@@ -17,8 +17,13 @@ function UserStore() {
   const [showSuccess, setShowSuccess] = useState(false)
 
   useEffect(() => {
-    setProducts(getProducts())
-    setCart(getCart())
+    const loadData = () => {
+      setProducts(getProducts())
+      setCart(getCart())
+    }
+    
+    // Initial load
+    loadData()
     
     // Listen for cart updates
     const handleCartUpdate = (event) => {
@@ -28,10 +33,33 @@ function UserStore() {
         setCart(getCart())
       }
     }
+    
+    // Listen for product updates
+    const handleProductsUpdate = (event) => {
+      // Get fresh products from storage
+      const freshProducts = getProducts()
+      setProducts(freshProducts)
+    }
+    
+    // Listen for storage events (cross-tab synchronization)
+    const handleStorageChange = (e) => {
+      if (e.key === 'kevina_products' || !e.key) {
+        const freshProducts = getProducts()
+        setProducts(freshProducts)
+      }
+      if (e.key === 'kevina_cart' || !e.key) {
+        setCart(getCart())
+      }
+    }
+    
     window.addEventListener('cartUpdated', handleCartUpdate)
+    window.addEventListener('productsUpdated', handleProductsUpdate)
+    window.addEventListener('storage', handleStorageChange)
     
     return () => {
       window.removeEventListener('cartUpdated', handleCartUpdate)
+      window.removeEventListener('productsUpdated', handleProductsUpdate)
+      window.removeEventListener('storage', handleStorageChange)
     }
   }, [])
 
