@@ -134,7 +134,7 @@ const DEFAULT_PRODUCTS = [
       price: 5000,
       image: 'https://images.albertsons-media.com/is/image/ABS/960133960-C1N1?$ng-ecom-pdp-mobile$&defaultImage=Not_Available.jpg'
     }
-  ]
+]
 
 // Legacy function - products are now saved to Firestore
 // This function is kept for backward compatibility but should not be used for products
