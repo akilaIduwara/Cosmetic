@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getProducts, getCart, addToCart, removeFromCart, saveCart, getContent } from '../utils/storage';
+import { getCart, addToCart, removeFromCart, saveCart, getContent } from '../utils/storage';
+import { subscribeToProducts, getProductsFromFirestore } from '../utils/firestore';
 import ProductCard from '../components/ProductCard';
 import Cart from '../components/Cart';
 import OrderForm from '../components/OrderForm';
@@ -19,22 +20,23 @@ const Shop = () => {
     const [showOrderForm, setShowOrderForm] = useState(false);
 
     useEffect(() => {
-        const loadData = () => {
-            setProducts(getProducts());
-            setCart(getCart());
-            setContent(getContent().shop);
-        };
+        // Load cart and content from localStorage
+        setCart(getCart());
+        setContent(getContent().shop);
         
-        // Initial load
-        loadData();
+        // Set up real-time Firestore listener for products
+        const unsubscribe = subscribeToProducts((firestoreProducts) => {
+            console.log('Shop: Firestore products updated, count:', firestoreProducts.length);
+            setProducts(firestoreProducts);
+        });
         
-        // Force a re-render after a short delay to ensure mobile devices catch it
-        const timeoutId = setTimeout(() => {
-            const currentProducts = getProducts();
-            if (currentProducts.length > 0) {
-                setProducts([...currentProducts]);
+        // Also listen for custom events (for immediate updates)
+        const handleProductsUpdate = (event) => {
+            if (event.detail && Array.isArray(event.detail)) {
+                console.log('Shop: Products updated event, count:', event.detail.length);
+                setProducts([...event.detail]);
             }
-        }, 100);
+        };
         
         const updateContent = () => {
             setContent(getContent().shop);
@@ -44,44 +46,15 @@ const Shop = () => {
             setCart(getCart());
         };
         
-        const updateProducts = (event) => {
-            // Get fresh products from storage
-            const freshProducts = getProducts();
-            console.log('Shop: Products updated event, count:', freshProducts.length);
-            setProducts([...freshProducts]); // Force new array reference
-        };
-        
-        // Listen for storage events (cross-tab synchronization)
-        const handleStorageChange = (e) => {
-            // Check for products key or timestamp key
-            if (e.key === 'kevina_products' || e.key === 'kevina_products_timestamp' || !e.key) {
-                const freshProducts = getProducts();
-                console.log('Shop: Storage changed, products count:', freshProducts.length);
-                setProducts([...freshProducts]); // Force new array reference
-            }
-        };
-        
-        // Polling fallback - check for updates every 2 seconds
-        const pollInterval = setInterval(() => {
-            const currentProducts = getProducts();
-            if (currentProducts.length !== products.length) {
-                console.log('Shop: Polling detected change, updating products');
-                setProducts([...currentProducts]);
-            }
-        }, 2000);
-        
         window.addEventListener('contentUpdated', updateContent);
         window.addEventListener('cartUpdated', updateCart);
-        window.addEventListener('productsUpdated', updateProducts);
-        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('productsUpdated', handleProductsUpdate);
         
         return () => {
-            clearTimeout(timeoutId);
-            clearInterval(pollInterval);
+            unsubscribe(); // Unsubscribe from Firestore listener
             window.removeEventListener('contentUpdated', updateContent);
             window.removeEventListener('cartUpdated', updateCart);
-            window.removeEventListener('productsUpdated', updateProducts);
-            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('productsUpdated', handleProductsUpdate);
         };
     }, []);
 
@@ -257,11 +230,6 @@ const Shop = () => {
                             style={{ gridColumn: '1 / -1' }}
                         >
                             <p>No products found. Try a different search or filter.</p>
-                            {products.length === 0 && (
-                                <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#999' }}>
-                                    Total products in storage: {getProducts().length}
-                                </p>
-                            )}
                         </motion.div>
                     )}
                 </motion.div>

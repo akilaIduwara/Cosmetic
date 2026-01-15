@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { getProducts, getCart, addToCart, getContent } from '../utils/storage';
+import { getCart, addToCart, getContent } from '../utils/storage';
+import { subscribeToProducts } from '../utils/firestore';
 import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
 import './Home.css';
@@ -12,15 +13,24 @@ const Home = () => {
     const [content, setContent] = useState(getContent().home);
 
     useEffect(() => {
-        const loadData = () => {
-            const allProducts = getProducts();
-            setProducts(allProducts.slice(0, 6)); // Show first 6 products
-            setCart(getCart());
-            setContent(getContent().home);
-        };
+        // Load cart and content from localStorage
+        setCart(getCart());
+        setContent(getContent().home);
         
-        // Initial load
-        loadData();
+        // Set up real-time Firestore listener for products
+        const unsubscribe = subscribeToProducts((firestoreProducts) => {
+            console.log('Home: Firestore products updated, count:', firestoreProducts.length);
+            // Show first 6 products
+            setProducts(firestoreProducts.slice(0, 6));
+        });
+        
+        // Also listen for custom events (for immediate updates)
+        const handleProductsUpdate = (event) => {
+            if (event.detail && Array.isArray(event.detail)) {
+                console.log('Home: Products updated event, count:', event.detail.length);
+                setProducts(event.detail.slice(0, 6));
+            }
+        };
         
         const updateContent = () => {
             setContent(getContent().home);
@@ -30,42 +40,15 @@ const Home = () => {
             setCart(getCart());
         };
         
-        const updateProducts = () => {
-            const allProducts = getProducts();
-            console.log('Home: Products updated, count:', allProducts.length);
-            setProducts(allProducts.slice(0, 6)); // Show first 6 products
-        };
-        
-        // Listen for storage events (cross-tab synchronization)
-        const handleStorageChange = (e) => {
-            // Check for products key or timestamp key
-            if (e.key === 'kevina_products' || e.key === 'kevina_products_timestamp' || !e.key) {
-                const allProducts = getProducts();
-                console.log('Home: Storage changed, products count:', allProducts.length);
-                setProducts(allProducts.slice(0, 6));
-            }
-        };
-        
-        // Polling fallback - check for updates every 2 seconds
-        const pollInterval = setInterval(() => {
-            const currentProducts = getProducts();
-            if (currentProducts.length !== products.length) {
-                console.log('Home: Polling detected change, updating products');
-                setProducts(currentProducts.slice(0, 6));
-            }
-        }, 2000);
-        
         window.addEventListener('contentUpdated', updateContent);
         window.addEventListener('cartUpdated', updateCart);
-        window.addEventListener('productsUpdated', updateProducts);
-        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('productsUpdated', handleProductsUpdate);
         
         return () => {
-            clearInterval(pollInterval);
+            unsubscribe(); // Unsubscribe from Firestore listener
             window.removeEventListener('contentUpdated', updateContent);
             window.removeEventListener('cartUpdated', updateCart);
-            window.removeEventListener('productsUpdated', updateProducts);
-            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('productsUpdated', handleProductsUpdate);
         };
     }, []);
 

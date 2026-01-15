@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getProducts, getCart, addToCart as addToCartStorage, removeFromCart as removeFromCartStorage, saveCart } from '../utils/storage'
-
-// Helper to get products count for debugging
-const getProductsCount = () => getProducts().length
+import { getCart, addToCart as addToCartStorage, removeFromCart as removeFromCartStorage, saveCart } from '../utils/storage'
+import { subscribeToProducts, getProductsFromFirestore } from '../utils/firestore'
 import Header from './Header'
 import ProductCard from './ProductCard'
 import Cart from './Cart'
@@ -20,21 +18,22 @@ function UserStore() {
   const [showSuccess, setShowSuccess] = useState(false)
 
   useEffect(() => {
-    const loadData = () => {
-      setProducts(getProducts())
-      setCart(getCart())
-    }
+    // Load cart from localStorage
+    setCart(getCart())
     
-    // Initial load
-    loadData()
+    // Set up real-time Firestore listener for products
+    const unsubscribe = subscribeToProducts((firestoreProducts) => {
+      console.log('UserStore: Firestore products updated, count:', firestoreProducts.length)
+      setProducts(firestoreProducts)
+    })
     
-    // Force a re-render after a short delay to ensure mobile devices catch it
-    const timeoutId = setTimeout(() => {
-      const currentProducts = getProducts()
-      if (currentProducts.length > 0) {
-        setProducts([...currentProducts])
+    // Also listen for custom events (for immediate updates)
+    const handleProductsUpdate = (event) => {
+      if (event.detail && Array.isArray(event.detail)) {
+        console.log('UserStore: Products updated event, count:', event.detail.length)
+        setProducts([...event.detail])
       }
-    }, 100)
+    }
     
     // Listen for cart updates
     const handleCartUpdate = (event) => {
@@ -45,46 +44,13 @@ function UserStore() {
       }
     }
     
-    // Listen for product updates
-    const handleProductsUpdate = (event) => {
-      // Get fresh products from storage
-      const freshProducts = getProducts()
-      console.log('UserStore: Products updated, count:', freshProducts.length)
-      setProducts([...freshProducts]) // Force new array reference
-    }
-    
-    // Listen for storage events (cross-tab synchronization)
-    const handleStorageChange = (e) => {
-      // Check for products key or timestamp key
-      if (e.key === 'kevina_products' || e.key === 'kevina_products_timestamp' || !e.key) {
-        const freshProducts = getProducts()
-        console.log('UserStore: Storage changed, products count:', freshProducts.length)
-        setProducts([...freshProducts]) // Force new array reference
-      }
-      if (e.key === 'kevina_cart' || !e.key) {
-        setCart(getCart())
-      }
-    }
-    
-    // Polling fallback - check for updates every 2 seconds
-    const pollInterval = setInterval(() => {
-      const currentProducts = getProducts()
-      if (currentProducts.length !== products.length) {
-        console.log('UserStore: Polling detected change, updating products')
-        setProducts([...currentProducts])
-      }
-    }, 2000)
-    
     window.addEventListener('cartUpdated', handleCartUpdate)
     window.addEventListener('productsUpdated', handleProductsUpdate)
-    window.addEventListener('storage', handleStorageChange)
     
     return () => {
-      clearTimeout(timeoutId)
-      clearInterval(pollInterval)
+      unsubscribe() // Unsubscribe from Firestore listener
       window.removeEventListener('cartUpdated', handleCartUpdate)
       window.removeEventListener('productsUpdated', handleProductsUpdate)
-      window.removeEventListener('storage', handleStorageChange)
     }
   }, [])
 
@@ -195,7 +161,7 @@ function UserStore() {
                   ))
                 ) : (
                   <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem' }}>
-                    <p>No products available. Total in storage: {getProductsCount()}</p>
+                    <p>No products available.</p>
                   </div>
                 )}
               </div>

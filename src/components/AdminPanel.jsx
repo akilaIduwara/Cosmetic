@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getProducts, saveProducts, getOrders } from '../utils/storage'
+import { getOrders } from '../utils/storage'
 import { isAuthenticated, setAuthenticated, isAdmin } from '../utils/auth'
+import { 
+  getProductsFromFirestore, 
+  addProductToFirestore, 
+  updateProductInFirestore, 
+  deleteProductFromFirestore,
+  subscribeToProducts 
+} from '../utils/firestore'
 import AdminProductCard from './AdminProductCard'
 import ProductForm from './ProductForm'
 import ChangePassword from './ChangePassword'
@@ -21,56 +28,34 @@ function AdminPanel() {
   const [productFilter, setProductFilter] = useState('all') // all, skincare, haircare
 
   useEffect(() => {
-    const loadData = () => {
-      setProducts(getProducts())
-      setOrders(getOrders())
-    }
+    // Load orders from localStorage
+    setOrders(getOrders())
     
-    // Initial load
-    loadData()
+    // Set up real-time Firestore listener for products
+    const unsubscribe = subscribeToProducts((firestoreProducts) => {
+      console.log('AdminPanel: Firestore products updated, count:', firestoreProducts.length)
+      setProducts(firestoreProducts)
+    })
     
-    // Listen for product updates
+    // Also listen for custom events (for immediate updates)
     const handleProductsUpdate = (event) => {
-      // Get fresh products from storage
-      const freshProducts = getProducts()
-      setProducts(freshProducts)
-    }
-    
-    // Listen for storage events (cross-tab synchronization)
-    const handleStorageChange = (e) => {
-      // Check for products key or timestamp key
-      if (e.key === 'kevina_products' || e.key === 'kevina_products_timestamp' || !e.key) {
-        const freshProducts = getProducts()
-        console.log('AdminPanel: Storage changed, products count:', freshProducts.length)
-        setProducts([...freshProducts]) // Force new array reference
-      }
-      if (e.key === 'kevina_orders' || !e.key) {
-        setOrders(getOrders())
+      if (event.detail && Array.isArray(event.detail)) {
+        console.log('AdminPanel: Products updated event, count:', event.detail.length)
+        setProducts([...event.detail])
       }
     }
     
     window.addEventListener('productsUpdated', handleProductsUpdate)
-    window.addEventListener('storage', handleStorageChange)
     
     // Refresh orders every 5 seconds
     const interval = setInterval(() => {
       setOrders(getOrders())
     }, 5000)
     
-    // Polling fallback - check for updates every 2 seconds
-    const pollInterval = setInterval(() => {
-      const currentProducts = getProducts()
-      if (currentProducts.length !== products.length) {
-        console.log('AdminPanel: Polling detected change, updating products')
-        setProducts([...currentProducts])
-      }
-    }, 2000)
-    
     return () => {
+      unsubscribe() // Unsubscribe from Firestore listener
       clearInterval(interval)
-      clearInterval(pollInterval)
       window.removeEventListener('productsUpdated', handleProductsUpdate)
-      window.removeEventListener('storage', handleStorageChange)
     }
   }, [])
 
@@ -84,50 +69,37 @@ function AdminPanel() {
     setShowForm(true)
   }
 
-  const handleSaveProduct = (productData) => {
-    let updatedProducts
-    if (editingProduct) {
-      updatedProducts = products.map(p => 
-        p.id === editingProduct.id ? { ...productData, id: editingProduct.id } : p
-      )
-    } else {
-      // Use a more unique ID to avoid conflicts
-      const newId = Date.now() + Math.random()
-      updatedProducts = [...products, { ...productData, id: newId }]
+  const handleSaveProduct = async (productData) => {
+    try {
+      if (editingProduct) {
+        // Update existing product in Firestore
+        await updateProductInFirestore(editingProduct.id, productData)
+        console.log('AdminPanel: Product updated in Firestore:', editingProduct.id)
+      } else {
+        // Add new product to Firestore
+        const newProductId = await addProductToFirestore(productData)
+        console.log('AdminPanel: Product added to Firestore:', newProductId)
+      }
+      
+      // Close form - products will update automatically via Firestore listener
+      setShowForm(false)
+      setEditingProduct(null)
+    } catch (error) {
+      console.error('Error saving product:', error)
+      alert('Failed to save product. Please try again.')
     }
-    
-    console.log('AdminPanel: Saving products, count:', updatedProducts.length)
-    
-    // Save to storage (this will trigger events)
-    saveProducts(updatedProducts)
-    
-    // Update local state
-    setProducts([...updatedProducts])
-    setShowForm(false)
-    setEditingProduct(null)
-    
-    // Force multiple updates to ensure all tabs/devices catch it
-    setTimeout(() => {
-      const freshProducts = getProducts()
-      setProducts([...freshProducts])
-      // Trigger another event manually
-      window.dispatchEvent(new CustomEvent('productsUpdated', { 
-        detail: freshProducts,
-        bubbles: true
-      }))
-    }, 50)
-    
-    setTimeout(() => {
-      const freshProducts = getProducts()
-      setProducts([...freshProducts])
-    }, 200)
   }
 
-  const handleDeleteProduct = (id) => {
+  const handleDeleteProduct = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
-      const updatedProducts = products.filter(p => p.id !== id)
-      setProducts(updatedProducts)
-      saveProducts(updatedProducts)
+      try {
+        await deleteProductFromFirestore(id)
+        console.log('AdminPanel: Product deleted from Firestore:', id)
+        // Products will update automatically via Firestore listener
+      } catch (error) {
+        console.error('Error deleting product:', error)
+        alert('Failed to delete product. Please try again.')
+      }
     }
   }
 

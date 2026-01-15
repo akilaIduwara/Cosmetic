@@ -1,12 +1,24 @@
+// NOTE: Product storage has been migrated to Firebase Firestore
+// This file now only handles cart, orders, and content management
+// Products are managed via src/utils/firestore.js
+
 const STORAGE_KEY = 'kevina_products'
 
-export const getProducts = () => {
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (stored) {
-    return JSON.parse(stored)
+// Legacy function - now redirects to Firestore
+// Kept for backward compatibility during migration
+export const getProducts = async () => {
+  // Import dynamically to avoid circular dependencies
+  const { getProductsFromFirestore } = await import('./firestore')
+  try {
+    return await getProductsFromFirestore()
+  } catch (error) {
+    console.error('Error getting products from Firestore:', error)
+    return []
   }
-  // Default products from original HTML
-  return [
+}
+
+// Legacy default products - no longer used, kept for reference
+const DEFAULT_PRODUCTS = [
     {
       id: 1,
       name: 'The Ordinary Alpha Arbutin',
@@ -124,39 +136,13 @@ export const getProducts = () => {
   ]
 }
 
-export const saveProducts = (products) => {
-  try {
-    const productsString = JSON.stringify(products)
-    localStorage.setItem(STORAGE_KEY, productsString)
-    
-    // Dispatch custom event for same-tab/window updates
-    const event = new CustomEvent('productsUpdated', { 
-      detail: products,
-      bubbles: true,
-      cancelable: true
-    })
-    window.dispatchEvent(event)
-    
-    // Trigger a storage change event manually for same-tab listeners
-    // Note: StorageEvent only fires automatically in OTHER tabs, not the current tab
-    // So we manually trigger it for same-tab synchronization
-    if (typeof StorageEvent !== 'undefined') {
-      // Create a synthetic storage event for same-tab updates
-      const storageEvent = new Event('storage')
-      Object.defineProperty(storageEvent, 'key', { value: STORAGE_KEY, writable: false })
-      Object.defineProperty(storageEvent, 'newValue', { value: productsString, writable: false })
-      Object.defineProperty(storageEvent, 'oldValue', { value: localStorage.getItem(STORAGE_KEY), writable: false })
-      window.dispatchEvent(storageEvent)
-    }
-    
-    // Also use a timestamp-based trigger for cross-tab sync
-    localStorage.setItem(STORAGE_KEY + '_timestamp', Date.now().toString())
-    
-    console.log('Products saved successfully. Count:', products.length)
-  } catch (error) {
-    console.error('Error saving products:', error)
-    throw error
-  }
+// Legacy function - products are now saved to Firestore
+// This function is kept for backward compatibility but should not be used for products
+// Products should be saved using addProductToFirestore() or updateProductInFirestore() from firestore.js
+export const saveProducts = async (products) => {
+  console.warn('saveProducts() is deprecated. Products should be saved to Firestore using addProductToFirestore() or updateProductInFirestore()')
+  // This function is no longer used for products - they're managed in Firestore
+  // Kept for cart/orders compatibility only
 }
 
 export const getCart = () => {
